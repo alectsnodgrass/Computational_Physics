@@ -1,4 +1,4 @@
-Code.py is a python script that demonstrates several numeric integration techniques.  % $'\(sin(sqrt(100x))^{2}\)'$ 0 to 2.  explanation of theory
+Code.py is a python script that demonstrates several numeric integration techniques.  % $`sin(sqrt(100x))^{2}`$ 0 to 2.  explanation of theory
 
 The first technique it demonstrates is the trapezoid rule. The trapezoid rule takes the average of the leftpoint and rightpoint rules. These methods incorporate the Reimann sum technique which splits the area under the curve into N rectangles and adds up the area of each rectangle. The height of each rectangle is typically taken at the left, right, or middle of the rectangle--- hence the names of the rules. As one might imagine, the estimate becomes more accurate at higher values of N. Specifically, as N increases the error of leftpoint or rightpoint decreases proportionally to 1/N and the error of midpoint or trapezoid decreases proportionally to 1/N^2.
 
