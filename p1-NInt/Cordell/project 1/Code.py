@@ -68,3 +68,28 @@ for i in N_array:
     print("The number of slices, estimate of the integral, and estimated error respectively are:",subintervals(trapezoid, i))
 
 
+def midpoint(f,a,b,N):        
+    h = f
+    mysum = 0
+    x_array = np.linspace(a, b, N)
+    w = (b-a)/(N-1)
+    mid_array = [x + (w/2) for x in x_array]
+    mid_array = np.array(mid_array)
+    A_array = h(mid_array)*w
+    mysum = np.sum(A_array)
+    mysum = mysum - A_array[N-1]     # 
+    return mysum   
+
+def Simpson(f, a, b, N):
+    return (1/3 * trapezoid(f, a, b, N)) + (2/3 * midpoint(f, a, b, N))
+
+# Simpson with limits -1 to 1 is guassian quadrature. 
+# PLanning to do the u sub before sending to simpson
+
+def sub(u): 
+    x = ((b-a)*u/2)+(a+b)/2
+    dx_over_du = 2/(b-a)
+    return (1/dx_over_du)*(sin(x))
+
+print("Guassian Quad result for 1000 subintervals: ", Simpson(sub, -1, 1, 1000))
+
