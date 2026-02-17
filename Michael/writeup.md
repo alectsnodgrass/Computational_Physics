@@ -5,7 +5,7 @@
 ## The Trapezoidal Rule
 
 
-From the pervious jupyter notebooks, we know that the trapeoidal rule is a numerical scheme for evaluating integrals. It works by locally approximating the function as a line and thus the area underneath it as a trapezoid. An iinteresting thing to examine for a numerical method is the rate at which it converges to the true value. So, we want to integrate the function
+From the pervious jupyter notebooks, we know that the trapezoidal rule is a numerical scheme for evaluating integrals. It works by locally approximating the function as a line and thus the area underneath it as a trapezoid. An iinteresting thing to examine for a numerical method is the rate at which it converges to the true value. So, we want to integrate the function
 
 $$
 f(x) = \sin(\sqrt{100 x})
