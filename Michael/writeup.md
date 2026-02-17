@@ -299,7 +299,7 @@ Simplify
 \frac{16}{\sqrt{2}}\sin^5 (u) \ du.
 ```
 
-Since $\frac{16}{\sqrt{2}} = 8\sqrt{2}$,
+We have that $\frac{16}{\sqrt{2}} = 8\sqrt{2}$
 
 ```math
 \boxed{
