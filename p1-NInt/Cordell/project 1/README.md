@@ -7,11 +7,11 @@ Simpson's method is a weighted average of the midpoint and trapezoid rule where 
 The Guassian quadrature method first parameterizes an integral to go from -1 to 1.
 
 To run the code.py script open the command prompt from the directory you have the it in:
-1) conda activate [the name of your environment]
-2) python code.py
+```cmd
+conda activate [the name of your environment]
+python code.py
+```
 
-% document implementation of algortihms
-Here is a breakdown and explanations of important code segments:
 
 ```python
 def leftpoint(f,a,b,N):
