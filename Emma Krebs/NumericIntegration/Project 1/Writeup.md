@@ -91,23 +91,6 @@ to represent this equation. The definition takes in the parameters func (given f
 
 This function definition is what passes the function, a, and b to the trapezoid_function. It also passes the true value of the integral (calculated through some other method) and the precision to which we want to know the accuracy of the approximation. It tracks the number of subintervals, the apporximated sum of that specific subinterval number, and the error from the true answer. The approximator function will also stop once an accuracy to whatever given significant figure is reached. I changed up my method of calculation for this cutoff from notebook 3. I originally used half the final decimal place of wanted degree of accuracy (ie. 10^-4 accuracy meant 0.00005 was passed). However, this didn't always result in the accuracy we were interested in, so I found a nice slideshow from Illinois.edu that gave me the corrected version we see above. It looks to find when the relative error is less than or equal to 10<sup>-n + 1</sup> where n is the decimal significant figure. An example of this is if relative error is 10<sup>-2</sup> then the approximation of x has at most three significant figures. The approximator calls on error_calc to find this relative error and then compare it to the passed sig_fig value. Since we were interested in accuracy to the 10^-6 degree, I passed 0.00005 as our sig_fig value to get a value within that error. Until it finds that n, it will double the number of subintervals each loop. The result of this is the following table:
 
-<<<<<<< Updated upstream
-    Subintervals     Summation   Error(%)
-    0              1  0.9999753124   0.56948%
-    1              2  0.7959466253  20.85666%
-    2              4  0.6983700870  30.55898%
-    3              8  1.0349702802   2.91018%
-    4             16  0.9467001204   5.86679%
-    5             32  0.9784652387   2.70829%
-    6             64  0.9979096693   0.77487%
-    7            128  1.0036893156   0.20018%
-    8            256  1.0051951162   0.05045%
-    9            512  1.0055754278   0.01264%
-    10          1024  1.0056707479   0.00316%
-    11          2048  1.0056945931   0.00079%
-    12          4096  1.0057005553    0.0002%
-    13          8192  1.0057020459     5e-05%
-=======
             Subintervals     Summation   Error(%)
         0              1  0.9999753124   0.56948%
         1              2  0.7959466253  20.85666%
@@ -123,7 +106,6 @@ This function definition is what passes the function, a, and b to the trapezoid_
         11          2048  1.0056945931   0.00079%
         12          4096  1.0057005553    0.0002%
         13          8192  1.0057020459     5e-05%
->>>>>>> Stashed changes
 
 ### Gaussian Quadrature
 
