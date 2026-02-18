@@ -245,7 +245,7 @@ Now that we have this paper's definition, we can do the proof.
 
 <ins>Proof.</ins>
 
-Suppose w(x) is an arbitrary weight function and A = {u<sub>1</sub>... u<sub>n</sub>} is the associated orthogonal polynomial set that spans all polynomials of degree $\&le$ n. Let u<sub>n+1</sub> be the associated orthogonal polynomial with degree n+1. Now, consider a monomial, or single term expression, x<sup>L</sup> where L &le n. Now, since orthogonal polynomials form a basis, we can write x<sup>L</sup> in terms of A such that
+Suppose w(x) is an arbitrary weight function and A = {u<sub>1</sub>... u<sub>n</sub>} is the associated orthogonal polynomial set that spans all polynomials of degree $&le$ n. Let u<sub>n+1</sub> be the associated orthogonal polynomial with degree n+1. Now, consider a monomial, or single term expression, x<sup>L</sup> where L &le n. Now, since orthogonal polynomials form a basis, we can write x<sup>L</sup> in terms of A such that
 
 ```math
 x^L = \sum_{i=0}^N \gamma_i u_i(x)
@@ -304,11 +304,11 @@ Q[f] approximates the integral of f(x)w(x), but given our f(x) definition we fin
 ```math
 Q[f] = \sum_{k=0}^n w_kf(x_k) = \int_a^b r(x))w(x)\,dx = I[f]
 ```
-Therefore, this is an exact integration for an f $\in$ **P**<sub>2n+1</sub>. This proof is complete once you let w(x) = 1 for Legendre polynomials (or u<sub>k</sub> = P<sub>k</sub>). The PDF notes that you can do a similar method to derive other quadrature polynomial estimates. Therefore, the optimal points for a quassian quadrature are the zeros of P<sub>n</sub> because it approximates to an exact intergration. $\blacksquare$
+Therefore, this is an exact integration for an f $\in$ **P**<sub>2n+1</sub>. This proof is complete once you let w(x) = 1 for Legendre polynomials (or u<sub>k</sub> = P<sub>k</sub>). The PDF notes that you can do a similar method to derive other quadrature polynomial estimates. Therefore, the optimal points for a quassian quadrature are the zeros of P<sub>n</sub> because it approximates to an exact integration. $\blacksquare$
 
 ## Languages, Libraries, Lessons Learned
 
-The primary language for this assignment was Python where we used the libraries scipy, numpy, and pandas. We have consistenly worked in Python from the beginning of this module to the final project. The pandas library was especially useful in creating tables and organizing information. I also learned how to create subplots. I knew you could make a 2x2 grid of plots, but I didn't know you could make sizes up to 4x4, so that was neat. Additionally, I enjoyed extension 2 because I am in linear algebra 2 right now, and I saw some similar techniques to what we are doing in that class right now.
+The primary language for this assignment was Python where we used the libraries scipy, numpy, and pandas. We have consistently worked in Python from the beginning of this module to the final project. The pandas library was especially useful in creating tables and organizing information. I also learned how to create subplots. I knew you could make a 2x2 grid of plots, but I didn't know you could make sizes up to 4x4, so that was neat. Additionally, I enjoyed extension 2 because I am in linear algebra 2 right now, and I saw some similar techniques to what we are doing in that class right now.
 
 ## Timekeeping
 
