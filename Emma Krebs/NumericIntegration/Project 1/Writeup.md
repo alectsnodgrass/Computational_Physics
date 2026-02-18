@@ -245,7 +245,7 @@ Now that we have this paper's definition, we can do the proof.
 
 <ins>Proof.</ins>
 
-Suppose w(x) is an arbitrary weight function and A = {u<sub>1</sub>... u<sub>n</sub>} is the associated orthogonal polynomial set that spans all polynomials of degree $\leq$ n. Let u<sub>n+1</sub> be the associated orthogonal polynomial with degree n+1. Now, consider a monomial, or single term expression, x<sup>L</sup> where L $\leq$ n. Now, since orthogonal polynomials form a basis, we can write x<sup>L</sup> in terms of A such that
+Suppose w(x) is an arbitrary weight function and A = {u<sub>1</sub>... u<sub>n</sub>} is the associated orthogonal polynomial set that spans all polynomials of degree less than or equal to n. Let u<sub>n+1</sub> be the associated orthogonal polynomial with degree n+1. Now, consider a monomial, or single term expression, x<sup>L</sup> where L $\leq$ n. Now, since orthogonal polynomials form a basis, we can write x<sup>L</sup> in terms of A such that
 
 ```math
 x^L = \sum_{i=0}^N \gamma_i u_i(x)
@@ -276,7 +276,7 @@ Now, let the points of our quadrature x<sub>0</sub>(x), x<sub>1</sub>(x),...,x<s
 ```math
 w_k = \int_a^b P_k(x)w(x)\,dx
 ```
-where P<sub>k</sub>(x) is the k<sup>th</sup> basis polynomial. Then, we can write an arbitrary polynomial (of degree &le 2n +1) as the divisible decomposition 
+where P<sub>k</sub>(x) is the k<sup>th</sup> basis polynomial. Then, we can write an arbitrary polynomial (of degree less than or equal to 2n +1) as the divisible decomposition 
 ```math
 f(x) = p(x)u_{n+1}(x) + r(x)
 ```
