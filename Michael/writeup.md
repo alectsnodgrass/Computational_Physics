@@ -286,13 +286,13 @@ Simplify
 \ du
 =
 \int_{0}^{\pi/2}
-\frac{16}{\sqrt{2}}\sin^5 (u) \ du.
+\frac{16}{\sqrt{2}}\sin^5 (u) \ du
 =
 \boxed{
 \int_{0}^{2} \frac{y^2}{\sqrt{2 - y}} \ dy
 =
 8\sqrt{2}
-\int_{0}^{\pi/2} \sin^5 (u) \ du
+\int_{0}^{\pi/2} \sin^5 (u) \ du.
 }
 ```
 
