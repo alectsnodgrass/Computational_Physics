@@ -96,11 +96,13 @@ The RK4(5) solver was not manually implemented in the code; instead, SciPy's opt
 ```python
 def RK45_solver(coord_init, tmin, tmax, nts, deriv):
 ...
-    solution = solve_ivp(swapped_deriv, (tmin, tmax), coord_init, t_eval=t, method='RK45')
+    solution = solve_ivp(swapped_deriv, (tmin, tmax), coord_init, t_eval=t, method='RK45', rtol=1e-9, atol=1e-12)
     # Where 'swapped_deriv' is a modified function for the differential equation that is compatible with solve_ivp.
     # And where 'solution' is an object that contains the time points and corresponding solutions. 
 ...
 ```
+> [!NOTE]
+> The rtol and atol parameters adjust the relative and absolute error tolerances, respectively. Adjusting these parameters allows for a clearer comparison between the RK45 and DOP853 solvers, which is important for this project.
 
 ### SciPy Integrator: DOP853
 The naming convention for this method is annoyingly cryptic, but it stands for **Do**rmand-**P**rince **8**(**5**, **3**): DOP853. Following the Runge-Kutta convention, this means that the DOP853 method is an eighth-order method with a fifth-order and third-order error estimate. This method is a member of the same family as the RK4(5) method, only more computationally intensive and more accurate. The SciPy library explains it as an eighth-order Runge-Kutta method originally from the *Fortran* library; it is particularly good for solving non-stiff ODEs with high precision. 
@@ -111,27 +113,78 @@ The implementation, once again, was not done manually. A simple call to the **so
 ```python
 def DOP853_solver(coord_init, tmin, tmax, nts, deriv):
 ...
-    sol = solve_ivp(swapped_deriv, (tmin, tmax), coord_init, t_eval=t, method='DOP853')
+    sol = solve_ivp(swapped_deriv, (tmin, tmax), coord_init, t_eval=t, method='DOP853', rtol=1e-9, atol=1e-12)
 ...
 ```
 
 ## Phase Space Trajectory and Energy Evolution of a Simple Harmonic Oscillator
-Insert images of the phase space plots for each of the solvers. These pictures will help demonstrate their capability and a use case. 
+The phase space trajectory and energy evolution of the SHO system were plotted for both cases (undamped and damped) for all three solvers. The different trajectories and energy calculations can be compared to investigate the difference in performance and accuracy of the solvers. 
 ### Phase Space Undamped SHM
+<figure>
+  <img src="Undamped_Phase_Space.png" style="width:50%">
+  <figcaption><strong>Figure 1.</strong> Undamped SHO Phase Space Trajectories.</figcaption>
+</figure>
+
 ### Phase Space Damped SHM
+<figure>
+  <img src="Damped_Phase_Space.png" style="width:50%">
+  <figcaption><strong>Figure 2.</strong> Damped SHO Phase Space Trajectories.</figcaption>
+</figure>
+
 ### Energy Evolution Undamped SHM
+<figure>
+  <img src="Undamped_Energy.png" style="width:50%">
+  <figcaption><strong>Figure 3.</strong> Energy Evolution of Undamped SHO.</figcaption>
+</figure>
+
 ### Energy Evolution Damped SHM
+<figure>
+  <img src="Damped_Energy.png" style="width:50%">
+  <figcaption><strong>Figure 4.</strong> Energy Evolution of Damped SHO.</figcaption>
+</figure>
+
+The similarities and accuracy of the RK45 and DOP853 solvers are on full display in the plots above. They nearly perfectly overlap and will only produce a visible difference if the number of time steps is different between the two. (The plots produced by varying the number of time steps between the solvers are much more geometrically aesthetic.) The point of the plots above is to emphasize that the RK45 and DOP853 methods are extremely accurate, producing results that are visually indistinguishable from the analytic solution. The Verlet method, however, is not as accurate but still quite close to the expected result and may be preferred in specific situations over the more computationally intensive methods.
 
 ## Strengths and Weaknesses of Each Solver
-This section is dedicated to comparing the different solvers. I will lower the number of points each one gets until there is a difference. I will time the functions to find a difference. The two from scipy are very good, so it will take a lot to find where their limits are. 
+This section will more clearly examine the differences in performance and accuracy of the three solvers. Because the error is much smaller than the scale of the system, observing the differences in trajectories and energy is difficult in the plots above. Therefore, the error between the numerical and analytic solutions is calculated and plotted on a semilog plot to help visualize the differences. This is especially helpful when comparing the RK45 and the DOP853 methods, which are both very accurate and very similar. 
 
-Magic Commands: %timeit
+To actually get a difference in performance between RK45 and DOP853, the error tolerances were adjusted, the number of time steps was reduced, the time scale was increased, and the frequency was increased. There are multiple error plots created in the code, but only a few are included here to demonstrate the general trends. 
 
-Plots of the phase/energy for different solvers with LOW nts until there is a difference
+### Position Error - Undamped SHM
+<figure>
+  <img src="Undamped_Position_Error.png" style="width:50%">
+  <figcaption><strong>Figure 5.</strong> Undamped SHO Position Error.</figcaption>
+</figure>
 
-Take the nts down and plot the same function for the different nts to compare it
+### Velocity Error - Damped SHM
+<figure>
+  <img src="Damped_Velocity_Error.png" style="width:50%">
+  <figcaption><strong>Figure 6.</strong> Damped SHO Velocity Error.</figcaption>
+</figure>
 
-There will be images of the plots that - hopefully- show the difference between the solvers. If it is not in the code yet, it will be simple to add. I will only need to write the plotting code and generate a png to include in the writeup.
+### Energy Error - Undamped SHM
+<figure>
+  <img src="Undamped_Energy_Error.png" style="width:50%">
+  <figcaption><strong>Figure 7.</strong> Energy Error of Undamped SHO.</figcaption>
+</figure>
+
+### Energy Error - Damped SHM
+<figure>
+  <img src="Damped_Energy_Error.png" style="width:50%">
+  <figcaption><strong>Figure 8.</strong> Energy Error of Damped SHO.</figcaption>
+</figure>
+
+### Timing
+The *magic command* **%timeit** was used to calculate the time taken for each solver to run with the same parameters (100 seconds, 1,000 time steps, and the same initial conditions) for both the undamped and damped cases. The results show the average time for 7 runs and are as follows:
+| Solver  | Undamped Time (ms) | Damped Time (ms) |
+|---------|--------------------|------------------|
+| Verlet  | 1.20               | 1.27             |
+| RK45    | 495                | 132              |
+| DOP853  | 123                | 56.1             |
+
+Unsurprisingly, the Verlet method is **way** faster than the other two methods. The Verlet method is neither complex nor computationally intensive, but it is also not as accurate. Surprisingly, the DOP853 method is **faster** than the RK45 method. This is not very intuitive because the DOP853 method is a much higher order and thus more computationally expensive. Why would the RK45 method take more time to do fewer steps? The answer is that although the RK45 method is less intensive per step, it requires more internal steps (not time steps) to achieve the same level of error as the DOP853 method. Remember, the internal, local error (absolute and relative) tolerances were adjusted to be the same for both methods. In an oversimplification, the DOP853 method is hits her first shot each step, while the RK45 method takes a few more shots to hit the same target.
+
+This interesting result stems from the specific system the solvers were applied to: the simple harmonic oscillator. The SHO is a well-behaved system with a *smooth* solution. DOP853, according to SciPy documentation, is particularly well adapted for **non-stiff** ODEs with high precision - which is exactly what this comparison is. The RK45 method is a more *general-purpose* method. It works very well for a variety of systems and lacks the optimization and specialization that other solvers may have. That being said, the RK45 method still returned very good results, very quickly, and is a very good choice for many systems. The Verlet method also returned good results very quickly, but lacks the robustness and accuracy of the other systems. There are many practical applications for a method that is less accurate - but fast. 
 
 ## Extensions
 
@@ -151,7 +204,8 @@ I used the following libraries in this project:
 2. Matplotlib.pyplot as plt
     - Used for plotting results and comparisons. Quite necessary for a project involving graphs. 
 3. Scipy.integrate.solve_ivp
-    - Finally, the most interesting library for this project was the one I used for integrators. This package offers a variety of differential equation solvers. I choose to use the RK4(5) and DOP853 methods. 
+    - Finally, the most interesting library for this project was the one I used for integrators. This package offers a variety of differential equation solvers. I chose to use the RK4(5) and DOP853 methods. 
 
 I did learn some more Python-specific syntax that will be helpful moving forward. For example, the *column_stack* function was useful for handling the 2D arrays for position and velocity. 
+
 
