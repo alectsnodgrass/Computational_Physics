@@ -32,11 +32,49 @@ $$
 x(t+\Delta t)=2x(t)-x(t-\Delta t)+\ddot{x}(t)\Delta t^2+\mathcal{O}(\Delta t^4)
 $$
 
-Scipy's ODEINT...
+Scipy's ODEINT incorporates a bunch of stuff it seems...
 
 # Procedure
 
 ## Function Code
+
+### Euler_Solver
+
+```python
+def SHO_solver_Euler(x0, v0, tmin, tmax, nts, SHO_deriv):
+    x_array = np.zeros(nts)                           
+    v_array = np.zeros(nts)                           
+    t_array = np.linspace(tmin, tmax, nts, endpoint=False)
+    dt = t_array[1] - t_array[0]                        
+    x_array[0] = x0                                     
+    v_array[0] = v0                                     
+    
+    for it in range(0, nts-1):
+        x_array[it+1] = x_array[it] + dt * SHO_deriv([x_array[it], v_array[it]], t_array[it])[0]
+        v_array[it+1] = v_array[it] + dt * SHO_deriv([x_array[it], v_array[it]], t_array[it])[1]
+    
+    return t_array, x_array, v_array
+```
+Comments
+### RK2_Solver
+```python
+def SHO_solver_RK2(x0, v0, tmin, tmax, nts, SHO_deriv):
+    x_array = np.zeros(nts)                                                     # array to hold position
+    v_array = np.zeros(nts)                                                     # array to hold velocity
+    t_array = np.linspace(tmin, tmax, nts, endpoint=False)                      # array holds the time points 
+    dt = t_array[1] - t_array[0]                                                # dt = time step length  
+    x_array[0] = x0                                                             # Initial position
+    v_array[0] = v0                                                             # Initial velocity
+    for it in range(0, len(t_array)-1 ):                                        # loop over time steps
+        t  = t_array[it]                                                        
+        x_h = x_array[it] + (dt/2 * SHO_deriv([x_array[it], v_array[it]], t)[0])                # sub-step 1 for RK2
+        v_h = v_array[it] + (dt/2 * SHO_deriv([x_array[it], v_array[it]], t)[1])                # sub-step 1 for RK2
+        x_array[it+1] = x_array[it] + (dt * SHO_deriv([x_h, v_h], t + dt/2)[0])         # sub-step 2 for RK2
+        v_array[it+1] = v_array[it] + (dt * SHO_deriv([x_h, v_h], t + dt/2)[1])         # sub-step 2 for RK2
+    return t_array, x_array, v_array
+```
+Comments
+### Verlet_Solver
 
 ```python
 def verlet_solver(x0, v0, tmin, tmax, nts, deriv):
@@ -56,6 +94,7 @@ def verlet_solver(x0, v0, tmin, tmax, nts, deriv):
 
     return t_array, x_array, v_array
 ```
+The verlet solver does this basically
 $$
 x_1 = x_0 + v_0\,\Delta t + \frac{1}{2}A(x_0)\,\Delta t^2,
 $$
@@ -64,7 +103,9 @@ $$
 x_{n+1} = 2x_n - x_{n-1} + A(x_n)\,\Delta t^2.
 $$
 
-## Physical Systems
+
+
+## subsection
 What ODE's did we test these on? Exponential decay... SHO with and without a linear dampening...
 
 What did we look at to analyze the methods?
@@ -74,6 +115,9 @@ Phase space...
 Energy (Hamiltonian)... (is energy conserved basically). State the relationship between energy conservation and phase space area.
 
 Relative error vs time... (maybe also pick some reasonable tmax and compare the error at tmax)
+
+We used these methods to solve ODEs for exponential decay and harmonic oscillation with and without a linear dampening term. We then plotted the phase-space diagrams for each method and compared their relative errors computed using the analytic solutions to the equations. As far as relative error goes, we plotted the relative error over time for each method as well as compared the relative errors between the methods at a chosen time point. Additionally, we created Energy vs. Time plots for each method, to show whether or not energy is conserved. 
+
 
 ## Plots
 
