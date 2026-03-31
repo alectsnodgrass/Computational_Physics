@@ -146,8 +146,6 @@ def Yoshida(X0, Y0, tmin, tmax, nts, du_dt):
 
 The first system that we will investigate the simple harmonic oscillator with and without damping. To simplify the equations, the equillbrium position is taken to be the origin so that erroneous terms accounting for the length of the spring do not have to be accounted for. Newton's Second Law gives the following equations of motion.
 
-(LaTex to depict the ODE for the system, then show the coupled 1st order system)
-
 ```math
 \ddot{x} = \frac{c}{m} \dot{x} + \frac{k}{m} x
 ```
@@ -178,6 +176,11 @@ def SHO_damped(t, u):
 Let's first look at how the this system evolves over time with no damping for the different integrators. 
 
 (Show the plot for the undamped oscillator here. Pick a time step good enough to show the different order errors active here)
+
+<div align="center">
+  <img src="SHO_Phase.png" alt="Undamped Trajectories" width="600">
+  <p><em>Figure 1:</em> Plots of the phasae space trajecotry for the undamped SHO for three different integrators.</p>
+</div>
 
 We can see that this traces out an ellipse in phase space, which is what we expect for the analytic solution for system. However, these methods are not outputting the exact same trajectory in phase space. You can resolve the difference by zooming in the plot range, but this is a good oppurtunitty to see how the total mechanical enerergy of this system evolves with the different methods. Physically, we know that it should be conserved because spring forces are conservative, but that is not exactly the case for these methods.
 
