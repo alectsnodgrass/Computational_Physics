@@ -61,7 +61,9 @@ def SHO_solver_Euler(x0, v0, tmin, tmax, nts, SHO_deriv):
 ```
 The recursive algorithm we use for Euler's method shown above is: 
 $$
-x_0 = x_0 \\
+x_0 = x_0
+$$
+$$
 v_0 = v_0
 $$
 
@@ -129,8 +131,10 @@ The verlet algorithm above is recursively defined as:
 
 
    $$
-   x_0 = x_0 \\
-    v_0 = v_0
+   x_0 = x_0
+   $$
+   $$
+   v_0 = v_0
    $$
 
    $$
@@ -308,7 +312,7 @@ In the undamped cases, phase space area seemed relatively conserved for Verlet m
 
 
  2. How do different integrators affect this variation in area?
- 
+
 All of the integrators seem to have a similar effect in the damped case in which the phase space area decays. However, in the undamped case Verlet integration stands out as it conserves phase space area whereas RK2 and Euler's method do not.
 
 
