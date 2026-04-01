@@ -244,14 +244,34 @@ The two symplectic methods seem to be conserving phase space volume while the ot
 
 <div align="center">
   <img src="SHO_Damped_Volume.png" alt="Damped Phase Volumes" width="600">
-  <p><em>Figure 5:</em> Plots of the phasae space volums over time for the damped SHO for three different integrators.</p>
+  <p><em>Figure 6:</em> Plots of the phasae space volums over time for the damped SHO for three different integrators.</p>
 </div>
 
 Now, all methods have the volume decaying to zero. This is not surprising of course. This system no longer conserves energy, and all initial conditions should tend towards the zero energy state at the origin. So, since all points get closer over time, the phase space area will decrease.
 
 ## n - Body Problem and the Virial Theorem
 
+The energy-conserving properties of symplectic integrators make them useful for the n-body problem. For this section, we will employ the 4th Order Yoshida method. Let's see how it handles a 5-body system with the following conditions.
 
+```python
+G = 1 #Gravitational Constant 
+M =  [1.0, .50, 0.50, .450, 0.450]            # Masses
+X0 = [[0,0], [2,0], [-2,0], [0,2], [0,-2]]    # Initial Positions
+V0 = [[0,0], [0,1], [0,-1], [-1,0], [1,0]]    # Initial Velocities
+```
+
+<div align="center">
+  <img src="5_Body_Trajectories.png" alt="5-Body simulation" width="600">
+  <p><em>Figure 7:</em> Trajectories of 5 gravitationally attracting masses.</p>
+</div>
+
+We have enough particles in this simulation to test the virial theorem. For a gravtiationally bound system, it related the averaeg kinetic and potential energy.
+
+```math
+<T> = -frac{1}{2} <U>
+```
+
+Let's first see how the kinetic and potential energy evolves over time 
 
 ## Conclusion
 (Idea to inclulde in this section: Which integrator is the best? There is not one that is objectively better than the others. The one that you choose depends on the the problem you are trying to solve and the context of your field.)
