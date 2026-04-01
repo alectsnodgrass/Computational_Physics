@@ -348,7 +348,7 @@ Which is pretty close to the -1/2 we would expect, so we can be reasonably sure 
 
 ## Phase Space Volume and Symplectic Methods
 
-Earlier, symplectic methods were described as conserving volume in phase space. This is something we can analyze with our undamped simple harmonic oscillator. Since this system follows the trajectory of one particle, we have a two dimensional phase space: Velocity vs Position. So, our volume becomes an area. Then, the algorithm is relativly simple. We want to see how the volume of a small patch of area in phase space evolves over time. To achieve this, we generate a list of random initial conditions that are close. This will approximate our patch of area. Then, we will use the concave_hull and shapely.geometry packages to generate a concave hull around our points as they evolve in time and calculate the area. Here is some sample code for the Velocity Verlet method.
+Symplectic methods are characterized as conserving volume in phase space. This is something we can analyze with our undamped simple harmonic oscillator. Since this system follows the trajectory of one particle, we have a two dimensional phase space: Velocity vs Position. So, our volume becomes an area. Then, the algorithm is relativly simple. We want to see how the are of a small patch of initial conditions in phase space evolves over time. To achieve this, we generate a list of random initial conditions that are close. This will approximate our patch of area. Then, we will use the concave_hull and shapely.geometry packages to generate a concave hull around our points as they evolve in time and calculate the area using the polygon object. Here is some sample code for how this can be done the Velocity Verlet method.
 
 ```python
 from concave_hull import concave_hull
@@ -359,7 +359,7 @@ tmin = 0 #s start time
 tmax = 50 #s end time
 nts = 350 #number of points between tmin and tmax
 
-n = 250
+n = 250 #number of points to test
 X0 = np.random.uniform(0.95, 1, size = n)
 Y0 = np.random.uniform(0.95, 1, size = n)
 
@@ -367,7 +367,7 @@ solutions = VelVerlet(X0, Y0, tmin, tmax, nts, SHO)
 t = solutions[0]
 
 PhaseVolumes = np.zeros(len(t))
-for j in range(len(t)):
+for j in range(len(t)): #caclulate the phase space volume over time
     P = [[solutions[k][0][j], solutions[k][1][j]] for k in range(1,n)]
     P = concave_hull(P, concavity=2.0)
     poly = Polygon(P)
@@ -375,14 +375,14 @@ for j in range(len(t)):
 
 plt.plot(t, PhaseVolumes, label = "Velocity Verlet")
 ```
-We can see how these different methods affect phase space. 
+We will compare the Velocity Verlet and Yoshida methods to LSODA. RK4(5) was omitted because it takes much longer to diverge than LSODA does. 
 
 <div align="center">
   <img src="SHO_Volume.png" alt="Undamped Phase Volumes" width="600">
   <p><em>Figure 7:</em> Plots of the phasae space volums over time for the undamped SHO for three different integrators.</p>
 </div>
 
-The two symplectic methods seem to be conserving phase space volume while the others are accumulating more error as the simulation continues! Now, let's see what happens when damping is introduced.
+The two symplectic methods seem to be conserving phase space volume while LSODA is accumulating more error as the simulation continues! Now, let's see what happens when damping is introduced.
 
 <div align="center">
   <img src="SHO_Damped_Volume.png" alt="Damped Phase Volumes" width="600">
