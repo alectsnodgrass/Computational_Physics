@@ -1,7 +1,7 @@
 # Introduction
 Numerical methods can be implemented to approximate solutions for ordinary differential equations (ODEs) that would otherwise be an algebraically labor-some task. This package was developed to demonstrate the capabilities of several approximation techniques which include Euler's method, the Runge-Kutta technique, Verlet integration, and Scipy's ODEINT. We provide an explanation of how each method works. Then, we showcase phase-space and Energy vs Time plots to illustrate the capabilities of each approximation technique and ability to conserve energy. By the same token, we analyze the error of these numerical methods in various manners.        
 
- We found that the while one method might be the most optimal for one situation, another method might be optimal for a different situation. The pros and cons of each method depending on the situation are further discussed in the report.
+ We found that the while one method might be the most optimal for one situation, another method might be optimal for a different situation. The pros and cons of each method depending on the situation are further discussed in the conclusion.
 ## Background Theory
 
 Euler's method is typically what one would start out with when exploring ODE approximation methods. It approximates the solution of an ODE at a point, B, by starting from an initial value, point A, and taking the next point B on the tangent line to the solution at point A. Then, it repeats the process for the subsequent points as depicted in Fig. 1. The number of these sub-intervals taken over time is typically referred to as the number of time steps (nts). And, the error of Euler's method reduces proportionally as the number of time steps increases, so we call it a first order method or a first order approximation. 
@@ -274,7 +274,7 @@ def triangle(x0, p0, dx, dp): # x0, p0 is one corner
 
 
 def triangle_area(x1, p1, x2, p2, x3, p3):
-    return 0.5 * np.abs(x1*(p2 - p3) + x2*(p3 - p1) + x3*(p1 - p2))
+    return 0.5 * np.abs(x1*(p2 - p3) + x2*(p3 - p1) + x3*(p1 - p2))    # determinant formula for area of triangle
 
 def phase_space_area(x0, p0, dx, dp, tmin, tmax, nts, deriv, solver):
     corners = triangle(x0, p0, dx, dp)      # initialize points
