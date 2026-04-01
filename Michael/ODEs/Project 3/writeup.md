@@ -278,6 +278,20 @@ Let's first see how the kinetic and potential energy evolves over time.
   <p><em>Figure 7:</em> total potential and kinetic energy of for 5 gravitationally attracting masses.</p>
 </div>
 
+The energy is clearly being conserved, and when we calculate the averages of kinetic and potential, we find the following.
+
+```math
+\langle T \rangle = 0.5790...
+```
+```math
+\langle U \rangle =-1.0103...
+```
+When we compute their ratio, we find
+```math
+\frac{\langle T \rangle}{\langle U \rangle} = -0.5249...
+```
+Which is pretty close to the -1/2 we would expect, so we can be reasonably sure that this is confirming the virial theorem.
+
 ## Conclusion
 (Idea to inclulde in this section: Which integrator is the best? There is not one that is objectively better than the others. The one that you choose depends on the the problem you are trying to solve and the context of your field.)
 
