@@ -91,6 +91,7 @@ plt.legend()
 plt.title('Total Energy vs Time')
 plt.xlabel('Time')
 plt.ylabel('Total Energy')
+plt.axis([0, 25, 0.9985, 1.001]) # Zoomed in on axis
 plt.show()
 
 # Relative Error
@@ -112,10 +113,12 @@ for analytic, symp, odient, rk in zip(analytic_total_array, symp_total_array, od
     relative_error_ode.append(error_ode)
     relative_error_rk.append(error_rk)
 
+# Zoomed out over entire time span
 plt.plot(energy[3][3], relative_error_symp, label='Symp')
 plt.plot(energy[3][3], relative_error_ode, label='Odeint')
 plt.plot(energy[3][3], relative_error_rk, label='RK45')
 plt.legend()
+plt.axis([0, 25, 0, 0.001]) # Zoomed in to compare first 25 seconds
 plt.xlabel('Time')
 plt.ylabel('Relative Error')
 plt.title('Relative Error for Methods Energy vs Time')
