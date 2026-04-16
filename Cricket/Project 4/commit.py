@@ -118,18 +118,28 @@ def move_2Dt(px, py):
       py += 1
     elif direction == 3: 
       py -= 1
-    elif direction == 4: # Diagonal 1
+    elif direction == 4: # diagonal 1
       py += 1
       px += (1 if py % 2 == 1 else -1)
-    elif direction == 5: # Diagonal 2
+    elif direction == 5: # diagonal 2
       py -= 1
       px += (1 if py % 2 == 1 else -1)
       
     return px, py
 
+def sticking_2Dt(px, py, grid, stickiness):
+  if py % 2 == 1:
+    dx = 1
+  else:
+    dx = -1
 
-
-
+  neighbors = [(px + 1, py), (px - 1, py), (px, py + 1), (px, py - 1), (px + dx, py + 1), (px + dx, py - 1)]
+  for i, j in neighbors:
+        if 0 <= i < grid.shape[0] and 0 <= j < grid.shape[1]:
+            if grid[i, j] > 0:
+                return ra.random() <= stickiness
+    return False
+  
 # ###
 # Extension 3: 3D Lattice
 
