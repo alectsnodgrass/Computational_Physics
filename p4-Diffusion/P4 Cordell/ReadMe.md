@@ -18,19 +18,70 @@ where $D_{C}$ is the capacity dimension, $\epsilon$ is the size of boxes, and N 
 *
 The capacity dimension can additionally be used to evaluate the effects of certain aspects of the model on its accuracy. 
 # Procedure 
-Describe algorithm in a step by step manner:
-1.  define space array
+Our model is described in a procedure below containing the main steps to simulate DLA.
+1.  Initializing a 2D space array
 ```python
-```
-2. define spawn radius
-```python
-```
-3. etc
-```python
+space = np.zeros((length, length), dtype=bool)            
+space[length//2, length//2] = True                        
 ```
 
+A boolean array is used to represent discrete 2D space (length x length blocks): An element is true or 1 if occupied and false or 0 if empty. The seed is initialized in the center.
 
+2. Defining a function to spawn particles
+```python
+def spawn(radius):
+    theta = np.random.uniform(0, 2 * np.pi) 
+    x, y = int(radius * np.cos(theta)), int(radius * np.sin(theta))
+    return x, y
+```
+The spawn function is called to spawn a particle at a random angle on an approximate circular parameter around the aggregate. We played around with different conditions for the radius of the parameter. Mainly we explored two conditions based on the radius of the aggregate's longest branch, $r_{max}$: radius = $r_{max}$ + 10 and radius = 2 * $r_{max}$.
 
+3. Implementing a kill radius
+```python
+def kill(i, x, y):
+    global length, space, heat, radius 
+
+    r_i = int(np.sqrt((x - length//2)**2 + (y - length//2)**2)) + 1          
+
+    if r_i > radius + 10:
+        return True
+    else:
+        return False
+```
+The kill function prevents particles from wandering far away from the circle. This tremendously improves runtime as particles are not allowed to wander far away which causes them to take much longer to find the aggregate. If the particle wanders more than 10 blocks outside the spawn radius, it is killed and respawned. Additionally, a kill radius does not alter the accuracy of the model because a particle has the same probability of being killed regardless of where it spawns and the spawn probability is uniformly distributed about the spawn parameter.
+
+4. Implementing random walks & checking neighbors
+```python
+# Loop until the particle sticks to aggregate
+    while (True):                       
+        # RANDOM WALK ALGORITHM
+        direction = random.getrandbits(2)
+        
+        if direction == 0:        
+            y += 1
+        elif direction == 1:
+            y -= 1
+        elif direction == 2:
+            x -= 1
+        else:
+            x += 1
+
+            # checks 3x3 neighborhood for crystal and ensures spot is not already occupied 
+            if (space[x-1, y-1] or space[x-1, y] or space[x-1, +1] or        
+                space[x,   y-1]                  or space[x,   y+1] or
+                space[x+1, y-1] or space[x+1, y] or space[x+1, y+1]
+                and not space[x, y]):                                            
+                
+                # Chance of sticking to the seed is the stickiness factor
+                if np.random.rand() < stickiness:                              
+                    space[x, y] = seed
+                    # tracks the age of the particle that sticks to the seed
+                    heat[x, y] = i + 1                                  
+                    resizing_square(i, x, y)
+                    resizing_circle(i, x, y)
+                    break 
+```
+The random walk algorithm chooses a random direction for the particle to walk. The random.getrandbits() function is used for optimal runtime. Then, the 8 neighboring elements are checked if they are part of the aggregate, and the current position is required to not already be occupied. The particle takes random walks until it reaches the aggregate and the if conditions are met. Once the conditions are met, the particle has a chance of sticking. Finally, once the particle sticks, the loop breaks.
 
 # Analysis 
 Fig: Capacity Dimension for N=5000
@@ -42,6 +93,10 @@ Fig: Capacity Dimension vs S
 Fig: Capacity Dimension vs R
 
 Fig: Compares Capacity dimension for two different spawn radius conditions
+
+Short runtime analysis demonstration
+```python
+```
 # Conclusions
 
 # References
