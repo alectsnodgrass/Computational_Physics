@@ -181,6 +181,85 @@ def update_3d(frame):
     ax.scatter(x, y, z, s=1, c=z, cmap='magma')
     ax.set_title(f"3D DLA : Particles={frame}, S={stickiness}")
 
+
+# helper functions that will help consolidate run time for section 9 (run -> reset -> run -> reset...)
+def run_dla_2d(stickiness, particles=5000):
+    grid = np.zeros((n, n))
+    grid[center, center] = 1
+    spawn, r_max = 10, 0
+
+    for _ in range(particles):
+        theta = ra.uniform(0, 2*np.pi)
+        px, py = int(center + spawn*np.cos(theta)), int(center + spawn*np.sin(theta))
+
+        while True:
+            px, py = move_2D(px, py)
+            dist = np.sqrt((px-center)**2 + (py-center)**2)
+
+            if dist > (spawn * kill_radius): break
+            if px < 1 or px >= n-1 or py < 1 or py >= n-1: break
+            if sticking(px, py, grid, stickiness):
+                grid[px, py] = 1
+                if dist > r_max:
+                    r_max = dist
+                    spawn = r_max + 10
+                break
+
+    return calculate_capacity_dimension(grid)
+
+
+def run_dla_tri(stickiness, particles=5000):
+    grid = np.zeros((n, n))
+    grid[center, center] = 1
+    spawn, r_max = 10, 0
+
+    for _ in range(particles):
+        theta = ra.uniform(0, 2*np.pi)
+        px, py = int(center + spawn*np.cos(theta)), int(center + spawn*np.sin(theta))
+
+        while True:
+            px, py = move_2Dt(px, py)
+
+            if px < 1 or px >= n-1 or py < 1 or py >= n-1: break
+            if sticking_2Dt(px, py, grid, stickiness, n):
+                grid[px, py] = 1
+                dist = np.sqrt((px-center)**2 + (py-center)**2)
+                if dist > r_max:
+                    r_max = dist
+                    spawn = r_max + 10
+                break
+
+    return calculate_capacity_dimension(grid)
+
+
+def run_dla_3d(stickiness, particles=1000):
+    grid = np.zeros((n3, n3, n3))
+    grid[center3, center3, center3] = 1
+    spawn = 5
+
+    for _ in range(particles):
+        phi = ra.uniform(0, 2*np.pi)
+        cost = ra.uniform(-1, 1)
+        theta = np.arccos(cost)
+
+        px = int(center3 + spawn*np.sin(theta)*np.cos(phi))
+        py = int(center3 + spawn*np.sin(theta)*np.sin(phi))
+        pz = int(center3 + spawn*np.cos(theta))
+
+        while True:
+            px, py, pz = move_3D(px, py, pz)
+            dist = np.sqrt((px-center3)**2 + (py-center3)**2 + (pz-center3)**2)
+
+            if dist > (spawn * kill_radius): break
+            if px < 1 or px >= n3-1 or py < 1 or py >= n3-1 or pz < 1 or pz >= n3-1: break
+            if np.any(grid[px-1:px+2, py-1:py+2, pz-1:pz+2] > 0):
+                grid[px, py, pz] = 1
+                if dist > spawn - 2:
+                    spawn = dist + 5
+                break
+
+    return calculate_capacity_dimension(grid)
+
 # initial variables
 n = 250
 grid_2d = np.zeros((n, n))
@@ -188,7 +267,7 @@ center = n // 2
 grid_2d[center, center] = 1
 spawn, r_max = 10, 0
 num_particles = 5000
-stickiness = 0.6
+stickiness = 0.9
 kill_radius = 4
 
 # ####################################################################################
@@ -278,7 +357,6 @@ plt.show()
 # SECTION 5: DLA TRIANGULAR 2D ANIMATION
 # ####################################################################################
 
-print("")
 print("Generating Triangular DLA Animation...")
 grid_ani_tri = np.zeros((n, n))
 grid_ani_tri[center, center] = 1
@@ -338,6 +416,7 @@ plt.show()
 # SECTION 7: DLA 3D ANIMATION
 # ####################################################################################
 
+print("")
 print("Generating 3D DLA Animation...")
 grid_ani_3d = np.zeros((n3, n3, n3))
 grid_ani_3d[center3, center3, center3] = 1
@@ -367,6 +446,40 @@ print(f"Capacity Dimension (2D Triangular):  {dimension_tri:.4f}")
 print(f"Capacity Dimension (3D):    {dimension_3d:.4f}")
 print("-" * 30)
 print("")
+
+# ####################################################################################
+# SECTION 9: CAPACITY DIMENSION VS STICKINESS
+# ####################################################################################
+
+print("")
+print("Generating Capacity Dimension vs Stickiness plots...")
+
+S_values = np.linspace(0.2, 1.0, 9) 
+
+dims_2d = []
+dims_tri = []
+dims_3d = []
+
+for S in S_values: # utilizing faster functions
+    print(f"Running simulations for S = {S:.2f}")
+    dims_2d.append(run_dla_2d(S))
+    dims_tri.append(run_dla_tri(S))
+    dims_3d.append(run_dla_3d(S))
+
+#plots
+plt.figure(figsize=(8,6))
+plt.plot(S_values, dims_2d, marker='o', color = 'red', label="2D Square")
+plt.plot(S_values, dims_tri, marker='s', color = 'purple', label="2D Triangular")
+plt.plot(S_values, dims_3d, marker='^', color = 'goldenrod', label="3D")
+
+plt.xlabel("Stickiness (S)")
+plt.ylabel("Capacity Dimension")
+plt.title("Capacity Dimension vs Stickiness")
+plt.legend()
+plt.grid()
+
+plt.savefig("capacity_vs_stickiness.png", dpi=300)
+plt.show()
 
 # ####################################################################################
 # END PROJECT 4
