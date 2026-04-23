@@ -272,4 +272,13 @@ One last thing to look at is how dimension changes as the aggregate grows.
   <p><em>Figure 5:</em> Effects of radius on the dimension for the aggregates </p>
 </div>
 
-Presuming that this is not an artifact of a buggy implimentation, this change is less smooth than the effect stickyness. We see that the capacity dimension starts to oscillate somewhat around 1.66. 
+Presuming that this is not an artifact of a buggy implimentation, this change is less smooth than the effect stickyness. We see that the capacity dimension starts to oscillate somewhat around 1.66.
+
+## Attribution
+Alec gave me the idea for the adaptive sampling of angles. That greatly sped up the algorithm. Besides that, various papers and articles online were not directly incorporated, but we helpful in putting together the algorithm.
+
+## Time Keeping
+About 30 hours was spent on the code and about 6 on the report.
+
+## Languages, Libraries, Lessons Learned
+Everything was written in python using matplotlib and numpy for plotting, computing, and animating. I learned about using the animating features the most as well as creative ways to use list slicing and reshaping for algorithms. 
