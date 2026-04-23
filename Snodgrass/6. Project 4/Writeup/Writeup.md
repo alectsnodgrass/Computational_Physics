@@ -466,7 +466,7 @@ From a computational perspective, this instability is not an artifact of the imp
 Skip through the animation, the branching is evident towards the end of the animation:
 <figure>
   <video src="./Videos/dla_growth_50000.mp4" controls width="600"></video>
-  <figcaption><strong>Figure 1.</strong> DLA growth animation of ~50,000 particles demonstrating branching.</figcaption>
+  <figcaption><strong>Figure 2.</strong> DLA growth animation of ~50,000 particles demonstrating branching.</figcaption>
 </figure>
 
 These observations motivated the introduction of a biasing mechanism in subsequent simulations, with the goal of redistributing particle influx and promoting more uniform growth. The effectiveness and implications of this modification are explored in the following sections.
@@ -483,7 +483,7 @@ The stickiness parameter $(S)$ plays a crucial role in determining the morpholog
   <video src="./Videos/s_050.mp4" controls width="400"></video>
   <video src="./Videos/s_085.mp4" controls width="400"></video>
   <video src="./Videos/s_095.mp4" controls width="400"></video>
-  <figcaption><strong>Figure 2.</strong> DLA growth animation with various stickiness parameters, demonstrating the effect on cluster morphology. In order: S=0.05, 0.15, 0.50, 0.85, 0.95.</figcaption>
+  <figcaption><strong>Figure 3.</strong> DLA growth animation with various stickiness parameters, demonstrating the effect on cluster morphology. In order: S=0.05, 0.15, 0.50, 0.85, 0.95.</figcaption>
 </figure>
 
 ## Capacity Dimension
@@ -512,14 +512,14 @@ The capacity dimension captures how the number of occupied boxes scales with box
 <figure>
   <video src="./Videos/capacity_dimension.mp4" controls width="400"></video>
   <img src="./Plots/capacity_dimension.png" controls width="400"></img>
-  <figcaption><strong>Figure 3.</strong> Capacity dimension of the DLA cluster calculated using box-counting methods (stickiness parameter S = 0.5).</figcaption>
+  <figcaption><strong>Figure 4.</strong> Capacity dimension of the DLA cluster calculated using box-counting methods (stickiness parameter S = 0.5).</figcaption>
 </figure>
 
 The capacity dimension calculated from this simulation is **$D = 1.551$**, which was fairly close to the expected result of $D \approx 1.65$. The number of particles in the cluster was only 10,000, which is small enough to produce noticeable differences. Additionally, the biasing mechanism implemented to promote isotropic growth may have influenced the morphology of the cluster and thus its fractal properties. Further simulations with larger particle counts and varying stickiness parameters are needed to fully explore these effects and confirm the relationship between stickiness and capacity dimension. For example, the following simulation shows the capacity dimension for a 64,000 particle cluster with a low stickiness parameter of $S = 0.1$. The capacity dimension for this cluster was calculated to be $D = 1.$, which is much closer to the expected value of $D \approx 1.65$.
 <figure>
   <video src="./Videos/W&S_replicate.mp4" controls width="400"></video>
   <img src="./Plots/W&S_replicate.png" controls width="400"></img>
-  <figcaption><strong>Figure 4.</strong> Capacity dimension (D = 1.659) for a 64,000 particle DLA cluster with low stickiness parameter S = 0.1.</figcaption>
+  <figcaption><strong>Figure 5.</strong> Capacity dimension (D = 1.659) for a 64,000 particle DLA cluster with low stickiness parameter S = 0.1.</figcaption>
 </figure>
 
 Side note: This simulation finished in 25 minutes. The simulation is able to run faster with lower stickiness values. 
@@ -534,12 +534,12 @@ To quantify this effect, the capacity dimension was computed for clusters genera
 <figure>
   <video src="./Videos/CD_low_S.mp4" controls width="400"></video>
   <img src="./Plots/CD_low_S.png" controls width="400"></img>
-  <figcaption><strong>Figure 5.</strong> Capacity dimension (D = 1.618) for a 16,000 particle DLA cluster with low stickiness parameter S = 0.05.</figcaption>
+  <figcaption><strong>Figure 6.</strong> Capacity dimension (D = 1.618) for a 16,000 particle DLA cluster with low stickiness parameter S = 0.05.</figcaption>
 </figure>
 <figure>
   <video src="./Videos/CD_high_S.mp4" controls width="400"></video>
   <img src="./Plots/CD_high_S.png" controls width="400"></img>
-  <figcaption><strong>Figure 6.</strong> Capacity dimension (D = 1.539) for a 16,000 particle DLA cluster with high stickiness parameter S = 0.95.</figcaption>
+  <figcaption><strong>Figure 7.</strong> Capacity dimension (D = 1.539) for a 16,000 particle DLA cluster with high stickiness parameter S = 0.95.</figcaption>
 </figure>
 
 The results indicate a weak inverse correlation between stickiness and capacity dimension within the parameter range studied. Higher stickiness values produce more branched clusters with reduced effective dimensionality, while lower stickiness yields comparatively denser aggregates.
@@ -555,12 +555,12 @@ D(r) = \frac{\mathrm{d} \log M(r)}{\mathrm{d} \log r}
 <figure>
   <video src="./Videos/CD_radius_1.mp4" controls width="400"></video>
   <img src="./Plots/CD_vs_radius_1.png" controls width="400"></img>
-  <figcaption><strong>Figure 7.</strong> Capacity dimension as a function of radius for a 16,000 particle DLA cluster with high stickiness parameter S = 0.20.</figcaption>
+  <figcaption><strong>Figure 8.</strong> Capacity dimension as a function of radius for a 16,000 particle DLA cluster with high stickiness parameter S = 0.20.</figcaption>
 </figure>
 <figure>
   <video src="./Videos/CD_radius_2.mp4" controls width="400"></video>
   <img src="./Plots/CD_vs_radius_2.png" controls width="400"></img>
-  <figcaption><strong>Figure 8.</strong> Capacity dimension as a function of radius for a 16,000 particle DLA cluster with high stickiness parameter S = 0.90.</figcaption>
+  <figcaption><strong>Figure 9.</strong> Capacity dimension as a function of radius for a 16,000 particle DLA cluster with high stickiness parameter S = 0.90.</figcaption>
 </figure>
 
 The results observed in the two “capacity dimension as a function of radius” graphs are consistent with the structure of the function `CD_vs_radius()`. The initial sharp increase in $D(r)$ occurs because, at small radii, the cumulative particle count $(M(r))$ grows rapidly in a discrete and highly sensitive regime. In this region, logarithmic differentiation amplifies small changes in particle number, producing large fluctuations in the estimated dimension.
@@ -574,11 +574,11 @@ To further explore the behavior of DLA clusters at larger scales, an animation w
 ### Limit of Local Computing Resources
 Below is the animation limit of a common laptop. Left running overnight, for about 12 hours, the simulation was able to generate a cluster with a little over 300,000 particles. 
 <figure>
-  <video src="./Videos/3e5.mp4" controls width="600"></video>
-  <figcaption><strong>Figure 9.</strong> DLA growth animation of 300,000 particles, the reasonable limit for a common laptop.</figcaption>
+  [View Figure 10 Animation](./Videos/3e5.mp4)
+  <figcaption><strong>Figure 10.</strong> DLA growth animation of 300,000 particles, the reasonable limit for a common laptop.</figcaption>
 </figure>
 <figure>
   <video src="./Videos/1e6.mp4" controls width="600"></video>
-  <figcaption><strong>Figure 10.</strong> DLA growth animation of 1 million particles demonstrating branching and fractal structure at larger scales.</figcaption>
+  <figcaption><strong>Figure 11.</strong> DLA growth animation of 1 million particles demonstrating branching and fractal structure at larger scales.</figcaption>
 </figure>
 
