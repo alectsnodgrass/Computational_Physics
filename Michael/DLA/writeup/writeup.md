@@ -247,15 +247,20 @@ The stickyness affectst the liklihood of a particle sticking once it reaches the
 </div>
 
 <div align="center">
+  <img src="S025.png" alt=Stickyness = 0.25" width="600">
+  <p><em>Figure 3:</em> Aggregate with S = 0.25 and N = 5000.</p>
+</div>
+
+<div align="center">
   <img src="S01.png" alt=Stickyness = 0.1" width="600">
-  <p><em>Figure 3:</em> Aggregate with S = 0.1 and N = 5000.</p>
+  <p><em>Figure 4:</em> Aggregate with S = 0.1 and N = 5000.</p>
 </div>
 
 When we generate this for many more values of the stickyness, we get a plot that looks something like this:
 
 <div align="center">
   <img src="CapacityVStciky.png" alt=Capacity V Stciky" width="600">
-  <p><em>Figure 4:</em> Effects of stickyness on the dimension for aggregates with N = 5000 points.</p>
+  <p><em>Figure 5:</em> Effects of stickyness on the dimension for aggregates with N = 5000 points.</p>
 </div>
 
 We can clearly see that as S decreases, the dimension increases towards two. This is because the stickyness being smaller allows particles to meander around near the aggregate. When they finally stick, they form clumps instead of the thin branches procduced by immediatley sticking. 
