@@ -73,7 +73,7 @@ Next, let us take a closer look at some of the more important functions!
 
 ## Languages, Libraries, Lessons Learned
 
--octree
+The main language was python and I used the libraries numpy, matplotlib, and os. I developed my skills with using object and classes in python and creating images and animations for aggregations. In particular, I learned how to use the os to more effectively store the .gifs and .pngs. I also learned how to do octrees, but they unfortunately did not end up working for this particular program (but they might be useful for my project over the summer!).
 
 ## Timekeeping
 
