@@ -64,9 +64,9 @@ We can initialize location with the randomly generated location from our generat
 ```python
 
 def random_walk(self):
-        dx, dy = random.choice([[-1, 0], [0, 1], [0, -1], [1, 0]])
-        self.location[0] += dx
-        self.location[1] += dy
+    dx, dy = random.choice([[-1, 0], [0, 1], [0, -1], [1, 0]])
+    self.location[0] += dx
+    self.location[1] += dy
 ```
 
 Here we make a random choice between four possible directions of movement and let that array equal our change in x and y directions. The object then accesses its own attribute to directly update this movement for its location. The final definition function that is important to note is the sticky function.
@@ -74,18 +74,67 @@ Here we make a random choice between four possible directions of movement and le
 ```python
 
 def sticky(self):
-        # This particle has the potential to get stuck. Check all particles nearby. 
+    # This particle has the potential to get stuck. Check all particles nearby. 
 
-        prob = self.probability
-        if random.uniform(0, 1) <= prob:
-            return True
-            
-        return False # It was not stuck
+    prob = self.probability
+    if random.uniform(0, 1) <= prob:
+        return True
+        
+    return False # It was not stuck
 ```
 
 This function accesses its probability and randomly generates a value between 0 and 1. If this value is smaller than or equal to the sticky probability the function returns true, updating the stuck parameter to be true. This is what ends our loop of random walks for a particle and thus is very important to moving onto the next particle. Otherwise, the function returns false and the random walks continue. 
 
-The next important function is the get_neighbors definition. This is 
+The next important function is the get_neighbors definition. This function grabs the surrounding neighbors to a particle's location and is always called after every random walk iteration. It includes diagonals for a total of eight neighbors.
+
+```python
+
+def get_neighbors(location):
+    '''
+        Grabs the surrounding neighbors. Includes diagonals as well for a total of eight neighbors.
+
+        Args:
+            location: Center location of where a particl is. 
+
+        Return:
+            neighborhood: A list of points around our given location for a 2D grid. 
+    '''
+
+    offsets = [[-1, 0], [1, 0], [0, 1], [0, -1], [-1, -1], [1, 1], [-1, 1], [1, -1]]
+    neighborhood = []
+
+    for offset in offsets: # For x coordinate
+        grid_x = location[0] + offset[0]
+        grid_y = location[1] + offset[1]
+
+        neighbor = [grid_x, grid_y]
+        neighborhood.append(neighbor)
+
+    return neighborhood
+```
+
+Locations of the eight values are found using offsets to the particle's location in all cardinal and diagonal directions. It is important to note that this function only grabs the locations of neighbors to create a neighborhood of values to check for 0's and 1's. It is Diffusion_Main.py that actually does the checking. Taking a quick side note to see what Diffusion_Main.py does with this, we see:
+
+
+```python
+
+neighbors = Diffusion_Functions.get_neighbors(particle.location)
+neighbor_count = 0
+touching = False
+
+for point in neighbors:
+    # Check if anything is touching 
+    if grid_array[point[0]][point[1]] == 1:
+        touching = True
+        neighbor_count += 1
+
+if touching and neighbor_count == 1: # Avoid overfilling and focus on tip growth by saying neighbor count = 1
+    result = particle.sticky()
+```
+
+Here we find that Diffusion_Main.py cycles through the neighbors, checking each grid position if any of the values equal 1. If it does, that means there's a possible particle to stick to, so it tells the program that the moving particle is touching the aggregate and should call the particle.sticky() function to see if it sticks. 
+
+
 
 ### Gifs/Images
 
