@@ -24,7 +24,6 @@ class Particle:
 
         prob = self.probability
         if random.uniform(0, 1) <= prob:
-            print("Sticky")
             return True
             
         return False # It was not stuck

@@ -2,13 +2,15 @@ import Boring_Diffusion_Functions
 import numpy as np
 import matplotlib.pyplot as plt
 
-grid_size = [500, 500]
-num_particles = 10000
+num_particles = 10000 # Note: Only use even numbers or else you will get error because of your division setup
+grid_value = int(num_particles/2)
+print(grid_value)
+grid_size = [grid_value, grid_value]
 current_maximum = 1
-generation_distance = 25
+generation_distance = 5
 center = [grid_size[0]/2, grid_size[1]/2]
 probability = 1
-kill_distance = 100
+kill_distance = 10
 stuck_locations = []
 
 # Create our quick array. This will be holding the information of particles nearby
@@ -27,7 +29,6 @@ while count < num_particles:
 
         particle.random_walk()
         if Boring_Diffusion_Functions.particle_from_center(particle, center) > kill_distance:
-            print("KILLED")
             break  # kill particle
 
         neighbors = Boring_Diffusion_Functions.get_neighbors(particle.location)
@@ -50,17 +51,18 @@ while count < num_particles:
                     current_maximum = Boring_Diffusion_Functions.particle_from_center(particle, center)
                     kill_distance = current_maximum + 50
                 count += 1
+                print(f"Count: {count}")
             else: 
                 continue
+
+    del particle
 
 print(stuck_locations)
 data = np.array(stuck_locations)
 x, y = data.T
-plt.scatter(x, y, marker='s', s=20)
+plt.scatter(x, y, marker='s', s=1, alpha=0.5, edgecolors=None)
 plt.gca().set_facecolor('black')
 plt.axis('equal')
-plt.xlim(0, grid_size[0])
+plt.xlim(0, grid_size[0])                                                                                                       
 plt.ylim(0, grid_size[1])
-plt.xticks(np.arange(0, grid_size[0]+1, 1))
-plt.yticks(np.arange(0, grid_size[1]+1, 1))
 plt.show()
