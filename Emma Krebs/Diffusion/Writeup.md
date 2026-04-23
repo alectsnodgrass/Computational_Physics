@@ -189,16 +189,27 @@ Capacity_Dimension.py tested five different stickiness probabilities for 5000 pa
 
 *Fig. 7) Aggregation of p = 0.01*
 
-We can see that as our probability decreases, our branches get thicker and the particles tend to be condensed. We can measure the capacity dimension over radius such that we can see this relationship:
-
-
-
+We can see that as our probability decreases, our branches get thicker and the particles tend to be condensed.
 
 ### Capacity Dimension and Topological Dimension
 
-As we mentioned before, the capacity dimension represents the number of particles inside of our aggregate's maximum size. In other words, it describes the density of fractal patterns for our problem. The topological dimension is what we traditionally think of for dimension, so for a 2D space it would be equal to 2. What does the capacity dimension look like in our 2D DLA then? We must consider our stickiness probabilities again. We saw previously for high probability there were sparse, branching aggregations while small probabilities had compact, more circular structures. We can study the global capacity dimension over these probabilities such that:
+As we mentioned before, the capacity dimension represents the number of particles inside of our aggregate's maximum size. In other words, it describes the density of fractal patterns for our problem. The topological dimension is what we traditionally think of for dimension, so for a 2D space it would be equal to 2. What does the capacity dimension look like in our 2D DLA then? We must consider our stickiness probabilities again. We saw previously for high probability there were sparse, branching aggregations while small probabilities had compact, more circular structures. We can measure the capacity dimension over radius such that we can see this relationship:
 
+<img src="Gifs_and_Images/RadiiDimension.png" width="400">
 
+*Fig. 7) Fractal Dimension vs Radii*
+
+While this is a little jittery, which I suspect is due to my 5000 particle count, we do see a slight stablization on the right side of the graph with clear distinction between our probabilities. For decreasing stickiness probability we see an increasing capacity dimension vs radii. We can also study this on a global scale where instead of radii we look at the entire aggregation:
+
+<img src="Gifs_and_Images/GlobalDimension.png" width="400">
+
+*Fig. 8) Fractal Dimension vs Increasing Box Sizes*
+
+Where the slopes of these linear lines are our capacity dimension. Again, we see for decreasing probability an increase in our dimension value. Both of these graphs end up approximating to roughly 1.75 at p = 0.01 (which is consistent with sources online saying it should be roughly 1.70). Therefore, capacity dimensions are less than topological dimensions. We can see this relationship in one final graph of fractal dimension vs stickiness probability. 
+
+<img src="Gifs_and_Images/StickyDimension.png" width="400">
+
+*Fig. 9) Fractal Dimension vs Stickiness*
 
 ## Extensions
 
