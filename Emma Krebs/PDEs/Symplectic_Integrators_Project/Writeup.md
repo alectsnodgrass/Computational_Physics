@@ -42,12 +42,31 @@ Although these all maintain similar shapes, if you look closely some appear to h
 
 ### Symplectic Integration
 
-- Explain what symplectic integration is and the function you used, what it does good at.
-- Include image showing the process the function goes through with midpoints. Include equation of calculation it does.
-- Explain why this makes sense.
-- Talk about linear dampending (spiral!)
+Symplectic integrators are used to solve second-degree ODEs which we do by applying it to a system of two 1st-degree ODEs. For a general variable u and v, we start with:
 
-Symplectic is unique 
+$$\dfrac{du}{dt} = f(t, v)$$
+$$\dfrac{dv}{dt} = g(t, u)$$
+
+where our Symplectic Euler can be written as the repetition of
+
+$$v_{n + 1} = v_n + hg(t_n, u_n)$$
+$$u_{n + 1} = u_n + hf(t_n, v_{n + 1})$$
+
+Notice that v is updated, and then u is updated with the already updated v. Also note that h, which is the step size of the function.
+
+For a harmonic oscillator, we can let:
+
+$$f(t, v) = -\omega^2v$$ and
+$$g(t, u) = u$$
+
+such that when we insert it into our previous equations we find
+
+$$v_{n + 1} = v_n + hu_n$$
+$$u_{n + 1} = u_n - h\omega^2v_{n + 1}$$
+
+The Symplectic integrator is the ODE solver we mentioned before that conserves energy. But what does that mean in context of integration? 
+
+An example of the function definition used for harmonic oscillation is shown below:
 
 ```python
     def Verlet_symplectic(x_0, p_0, tmax, w, damp, N):
