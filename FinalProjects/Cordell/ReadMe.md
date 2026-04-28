@@ -44,16 +44,65 @@ This project uses the MCNP code to analyze $k_{eff}$ across various geometries o
 
 # Procedure
 
-Code not allowed to be provided...
+The MCNP code takes input files in which surface, cell, and data cards are defined. 
 
-The MCNP code uses Monte Carlo methods to simulate neutron transport. The explanation of what the code does can be split up into 3 general categories of discussion: Geometry, Interactions, and Storing. First a geometry is defined as a mesh?For geometry it uses raytracing (which I don't know what that is so Im skipping this rn). To simulate interactions, it uses a large collection of data that contains the amplitudes for many interactions. Then, the amplitudes correspond to the probability of an interaction to occur at the given state or step to the next state or step. The history of a particle is stored and the simulation is iterated over a large number of particles who's historical information is averaged to approximate the solution.
+The surface cards define surfaces with given shape and position. For example the surface card below defines a set of cylindrical surfaces centered on the Z axis with radii: 7 cm, 14 cm, 21 cm, and 28 cm.
 
-Maybe I can put my input files? If not, I'm having trouble structuring this section.
+```
+c SURFACE CARDS
+$ CellID   Shape/Position   Radius
+1   CZ   7.000                                  
+2   CZ   14.000
+3   CZ   21.000
+4   CZ   28.000
+```
+
+The cell cards you tell it about each cell or volume. Below are cells of the volumes between each cylindrical surface...
+
+```
+c CELL CARDS
+$ SurfaceID   Material   Density   Inside:Outside   Track/kill
+10   100  -18.74  1 : -2      imp:n=1                      
+20   200  -1.0    2 : -3      imp:n=1                    
+30   100  -18.74  3 : -4      imp:n=1                    
+40   0            +4          imp:n=0                    
+```
+
+The data cards you tell it what to calculate and also define your materials. Below we have defined a mix of U235 and U238 and water.
+```
+c DATA CARDS
+$ Number histories per cycle     Initial Guess keff     Number Cycles to Skip Before Tallying     Total Cycles
+kcode 10000  1.0  1000  1100
+$ Initial position (x, y, z)      
+ksrc  0.0  0.0  0.0   
+$ Material     Atomic number and number of neutrons     Percent
+m100  92235 -.9473       
+      92238 -.0527
+m200  1001   2 
+      8016   1
+```
+
+
+We changed the geometries in the surface and cell cards. And estimated $k_{eff}$
 
 For different geometries and mediating materials, we estimated $k_{eff}$.
 
 # Analysis
-The MCNP code estimates $k_{eff}$ using Monte Carlo simulations.
+Using the MCNP code, we estimated $k_{eff}$ for various geometries. For our notable geometries, $k_{eff}$ ranges ().
+
+Label notable geometries A, B , C ...
+
+Describe those geometries
+
+Figures of qt plots of each geometry.
+
+Bar chart of geometry vs $k_{eff}$
+
+The max $k_{eff}$ is
 
 # Conclusions
-Our modeled neutron source with 18 kg of LEU yields a $k_{eff}$ value of 1.3. This shows that a geometry exists that yields a $k_{eff}$ at the safety threshold.
+In retrospect, efficient neutron transportation is vital to many modern physics experiments. The parameter, $k_{eff} = \frac{ neutrons current generation}{ neutrons previous generation}$ essentially describes the efficiency of a neutron source. If $k_{eff}$ exceeds 1 then the neutron source will inevitably blow up. This threshold is called criticality. Thus, for safety in neutron sources, $k_{eff}$ is given a safety threshold. 
+
+Researchers at LANL are interested in using an 18 kg mass of Uranium to booost the number of UCNs generated at LANSCE. Thus, we aim to demonstrate a geometry that results in criticality. By generating a geometry that results in criticality, we will show that a geometry exists to make a safe and efficient neutron source with 18 kg of Uranium.
+
+We used the MCNP code to model geometries for which we estimated $k_{eff}$. Our modeled neutron source with 18 kg of LEU yields a $k_{eff}$ value of ---. This shows that a geometry exists that yields a $k_{eff}$ at the safety threshold.
