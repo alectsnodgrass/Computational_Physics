@@ -12,8 +12,6 @@ meta:
 
 - Introduce topic. Explain different times of intergrations and how that effects the error, precision, and most importantly how to conserve energy in problems.
 - Explain why conserving energy is very important, give examples of programs that its important in (orbits, etc)
-- Introduce your program, working with simple harmonic motion, the equations and derivatives from your main source.
-- Explain how simple harmonic motion is a useful system to understand because of applications.
 
 ### What is Harmonic Oscillation and What Does it Look Like?
 
@@ -35,8 +33,9 @@ Although these all maintain similar shapes, if you look closely some appear to h
 - Explain why this makes sense.
 - Talk about linear dampending (spiral!)
 
-''' python
 
+
+```python
     def Verlet_symplectic(x_0, p_0, tmax, w, damp, N):
 
         t_array = np.linspace(0, tmax, N)
@@ -61,9 +60,7 @@ Although these all maintain similar shapes, if you look closely some appear to h
         p_array[-1] = (x_array[-1] - x_array[-2]) / h
     
         return x_array, p_array, t_array
-
-
-'''
+```
 
 
 ### RK45
@@ -72,8 +69,7 @@ RK45, also known as Runge–Kutta–Fehlberg method, is an adapative numerical t
 
 The function definition in the code is shown as:
 
-''' python
-
+```python
     def RK45_solver(x_0, p_0, tmax, w, damp, N):
 
         y_0 = [x_0, p_0]
@@ -87,8 +83,7 @@ The function definition in the code is shown as:
         p_array = sol.y[1]
     
         return x_array, p_array, t_array
-
-'''
+```
 
 
 
@@ -96,12 +91,14 @@ The function definition in the code is shown as:
 - Explain the snippet of code for Rk45 and how you set it up, what it does with its arguments, etc.
 
 ### Odeint
+
 - Explain what the Odent function is and what it does better than the other 
-- Include image showing the process the function goes through with midpoints. Include equation of calculation it does.
 - Explain the snippet of code for Odeint and how you set it up, what it does with its arguments, etc.
 - Talk about linear dampending
 
-''' python
+Calls the odeint function from scipy.integrate. odeint solves a system of ordinary 
+
+```python
 
     def Odeint_solver(x_0, p_0, tmax, w, damp, N):
 
@@ -111,8 +108,10 @@ The function definition in the code is shown as:
         L = odeint(Harmonic_deriv, y_0, t, args=(w, damp), tfirst=True, rtol=1e-4)
         
         return L[:,0], L[:,1], t
+```
 
-'''
+This function definition calls the Odeint function from scipy.integrate, and Odeint solves a system of ordinary of ordinary 
+differential equations using lsoda from the FORTRAN library odepack.
 
 ### Final Comparison
 
@@ -124,7 +123,7 @@ Now that we understand our three functions a little more, let us turn our attent
 
 Thus, the error is now apparent. However, we need a more direct way to compare it. To do this, we will be looking at the errors of these methods through Total Energy vs Time, Relative Error vs Time, and Energy Drift vs Time for a variety of N spacings. Let us start with the former. We need to start by finding the total energy using a function definition from ODE_Methods.py:
 
-''' python
+```python
 
     def Total_energy(x_array, p_array, w):
 
@@ -143,8 +142,7 @@ Thus, the error is now apparent. However, we need a more direct way to compare i
             total_energy.append(TE_value)
         
         return kinetic_energy, potential_energy, total_energy
-
-'''
+```
 
 This function returns the kinetic, potential, and total energy for a given array of x and p (along with their angular frequency) for a harmonic oscillator. It assumes the mass equals one so it can easily calculate these energies. It uses the general equations for kinetic and potentital energy such that for each x and p in these arrays:
 
@@ -162,7 +160,7 @@ As we see above, our baseline of the analytic solution is a flat line, which mak
 
 To compare these differences further, let us look at Relative Error vs Time. Here we calculate the relative error for these energies using the analytic value and the equation:
 
-$$\text{Relative Error} = | \text{analytic - estimated} | / (\text{analytic})$$
+$$\text{Relative Error} = \dfrac{|  \text{ analytic  -  estimated }  |}{(\text{analytic})}$$
 
 and we find
 
@@ -183,8 +181,7 @@ We see once again that even at low N the Symplectic method oscillates around 0, 
 ## Extensions
 
 ### Virial Theorem
-- The one I probabaly want to do the most
-- Planning to do gravity (If I have time I will do second system)
+TBA
 
 ## Languages, Libraries, Lessons Learned
 
