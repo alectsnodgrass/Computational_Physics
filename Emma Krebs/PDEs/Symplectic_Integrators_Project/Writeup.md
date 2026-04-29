@@ -10,7 +10,7 @@ meta:
 
 ## Types of Integrations
 
-Ordinary Differential Equations (ODEs) are differential equations that depend on one independent variable. ODEs can relate how systems can change over time or space, making them an extremely pervasive tool of mathematics for understanding how something develops. These functions can be solved numerically through integrators given an initial state. Thus, it is important to understand what these integrators are doing to our system and how they might accumulate error. An accurate ODE solver will be one that conserves the energy of the system, but what does that mean in context of our problem? We will start by considering harmonic oscillation, which also happens to be the main system we will investigate throughout this report. The function is given as:
+Ordinary Differential Equations (ODEs) are differential equations that depend on one independent variable. ODEs can relate how systems can change over time or space, making them an extremely pervasive tool of mathematics for understanding how something develops. These functions can be solved numerically through integrators given an initial state. Thus, it is important to understand what these integrators are doing to our system and how they might accumulate error. For conservative physical systems, a good long-term ODE solver will be on that preserves the total energy of the system, but what does that mean in context of our problem? We will start by considering harmonic oscillation, which also happens to be the main system we will investigate throughout this report. The function is given as:
 
 $$m\text{ }\dfrac{d^2y}{dt^2} = -ky$$
 
@@ -26,11 +26,11 @@ and if we plug in our previous equality we find that
 
 $$\dfrac{dE}{dt} = -ky\text{ } (\text{ }\dfrac{dy}{dt}\text{ }) + ky(\text{ }\dfrac{dy}{dt}\text{ }) = 0$$
 
-Therefore, our energy is conserved. A good ODE solver produces solutions that conserve energy, and unfortunately very few do. Throughout this report we will investigate three ODE solvers, only one of which will preserve energy. We will then analysis the error for these solvers to show why energy conservation is important for accuracy over long spans of time/space.
+Therefore, our energy is conserved. A good ODE solver produces solutions that conserve energy, and unfortunately very few do. Throughout this report we will investigate three ODE solvers, only one of which will preserve energy. We will then aanalyze the error for these solvers to show why energy conservation is important for accuracy over long spans of time/space.
 
 ### What is Harmonic Oscillation and What Does it Look Like?
 
-The main system we studied with these methods of integration was harmonic oscillation, which is defined to be a system that experiences a restoring force proportional to its displacement towards an equilibirum point. Some classical examples of this are mass springs and pendulums, where the restoring forces are from the spring and gravity, respectively. However, the harmonic oscillator is even more important to physics than just describing these simple examples because any mass subject to a force in stable equilibrium acts as a harmonic oscillator in small vibrations. Therefore, there are many physical phenomenon we can apply this system to, such as: quantum's potential wells, orbital perturbations, stellar oscillations, and more. 
+The main system we studied with these methods of integration was harmonic oscillation, which is defined to be a system that experiences a restoring force proportional to its displacement towards an equilibrium point. Some classical examples of this are mass springs and pendulums, where the restoring forces are from the spring and gravity, respectively. However, the harmonic oscillator is even more important to physics than just describing these simple examples because any mass subject to a force in stable equilibrium acts as a harmonic oscillator in small vibrations. Therefore, there are many physical phenomena we can apply this system to, such as: quantum potential wells, orbital perturbations, stellar oscillations, and more. 
 
 Harmonic oscillators are characterized by two main categories, damped and undamped oscillators. These change what their phase plot diagrams look like, which are their space vs momentum graphs. For undamped systems, they are circular or elliptical shaped paths depending on the angular frequency of the system. An angular frequency of one results in a circular shape. An angular frequency less than one stretches the circle in the positon axis' direction and above one stretches it into the momentum axis' direction. If an oscillator is damped, this means that there is a term that decreases the amplitude over time. In response, the phase space diagram breaks the circular/elliptical shape and spirals inward. An example of what these graphs look like are demonstrated below for the three integrators we will be investigating:
 
@@ -64,7 +64,28 @@ such that when we insert it into our previous equations we find
 $$v_{n + 1} = v_n + hu_n$$
 $$u_{n + 1} = u_n - h\omega^2v_{n + 1}$$
 
-The Symplectic integrator is the ODE solver we mentioned before that conserves energy. But what does that mean in context of integration? 
+The Symplectic integrator is the ODE solver we mentioned before that conserves energy. But what does that mean in the context of integration? Consider Liouville’s theorem that says phase space volume remains the same size when the system evolves over an action like time. In other words, phase space is conserved for the Hamiltonian as well is the geometrical structure of the system, which can be proved by considering the Hamiltonian of a harmonic oscillator and prove that for
+
+$$H = \dfrac{1}{2}p^2 + \dfrac{1}{2}x^2$$
+
+we must find that
+
+```math
+\begin{pmatrix}
+0 & 1  \\
+-1 & 0
+\end{pmatrix} = \begin{pmatrix}
+-H_{xp} & H_{pp}  \\
+-H_{xx} & -H_{px}
+\end{pmatrix} \begin{pmatrix}
+0 & 1  \\
+-1 & 0
+\end{pmatrix} \begin{pmatrix}
+-H_{xp} & -H_{xx}  \\
+H_{pp} & -H_{px}
+\end{pmatrix}
+```
+where by doing so proves that the harmonic oscillator is symplectic. 
 
 An example of the function definition used for harmonic oscillation is shown below:
 
@@ -98,7 +119,7 @@ An example of the function definition used for harmonic oscillation is shown bel
 
 ### RK45
 
-RK45, also known as Runge–Kutta–Fehlberg method, is an adapative numerical technique for solving ODEs. It uses intermediate calculations to produce two estimates of different accuracy. By doing this, it can adjust the time step sizes for high accuracy and efficiency. These technqiues have a range of different orders you can use for a probelm. In this case, RK45 computes a 4th and 5th order error estimate while RK2 would be a lower order with only a 2nd order estimate. Although RK45 excels at accuracy, it does not maintain the geometrical properties of the phase space, so it loses total energy from small numerical errors over time.
+RK45, also known as Runge–Kutta–Fehlberg method, is an adaptive numerical technique for solving ODEs. It uses intermediate calculations to produce two estimates of different accuracy. By doing this, it can adjust the time step sizes for high accuracy and efficiency. These techniques have a range of different orders you can use for a problem. In this case, RK45 computes a 4th and 5th order error estimate while RK2 would be a lower order with only a 2nd order estimate. Although RK45 excels at accuracy, it does not maintain the geometrical properties of the phase space, so it loses total energy from small numerical errors over time.
 
 The function definition in the code is shown as:
 
@@ -117,19 +138,13 @@ The function definition in the code is shown as:
     
         return x_array, p_array, t_array
 ```
-
-
-
-- Include image showing the process the function goes through with midpoints. Include equation of calculation it does.
-- Explain the snippet of code for Rk45 and how you set it up, what it does with its arguments, etc.
+Here, we use solve_ivp and feed it our Harmonic_deriv function definition and method name in order to calculate our three arrays.
 
 ### Odeint
 
-- Explain what the Odent function is and what it does better than the other 
-- Explain the snippet of code for Odeint and how you set it up, what it does with its arguments, etc.
-- Talk about linear dampending
-
-Calls the odeint function from scipy.integrate. odeint solves a system of ordinary 
+This function definition calls the Odeint function from scipy.integrate, and Odeint solves a system of ordinary 
+differential equations using LSODA from the FORTRAN library odepack. The method automatically switches between stiff and non-stiff solvers, 
+minimizing our error. Once again, this does not conserve phase space. 
 
 ```python
 
@@ -142,9 +157,6 @@ Calls the odeint function from scipy.integrate. odeint solves a system of ordina
         
         return L[:,0], L[:,1], t
 ```
-
-This function definition calls the Odeint function from scipy.integrate, and Odeint solves a system of ordinary of ordinary 
-differential equations using lsoda from the FORTRAN library odepack.
 
 ### Final Comparison
 
@@ -177,7 +189,7 @@ Thus, the error is now apparent. However, we need a more direct way to compare i
         return kinetic_energy, potential_energy, total_energy
 ```
 
-This function returns the kinetic, potential, and total energy for a given array of x and p (along with their angular frequency) for a harmonic oscillator. It assumes the mass equals one so it can easily calculate these energies. It uses the general equations for kinetic and potentital energy such that for each x and p in these arrays:
+This function returns the kinetic, potential, and total energy for a given array of x and p (along with their angular frequency) for a harmonic oscillator. It assumes the mass equals one so it can easily calculate these energies. It uses the general equations for kinetic and potential energy such that for each x and p in these arrays:
 
 $$KE_{Value} = \dfrac{1}{2} * p^2$$
 $$PE_{Value} = \dfrac{1}{2} * w^2 * x^2$$
@@ -218,7 +230,7 @@ TBA
 
 ## Languages, Libraries, Lessons Learned
 
-The main library I learned and used in this project was the Scipy library. I found out about the different integration methods you can call from this library. Additonally, in the future I will have to consider the error accumulated from the method I use for simulation projects and whether the conservation of energy in the system would be an issue.
+The main library I learned and used in this project was the Scipy library. I found out about the different integration methods you can call from this library. Additionally, in the future I will have to consider the error accumulated from the method I use for simulation projects and whether the conservation of energy in the system would be an issue.
 
 ## Timekeeping
 
