@@ -6,20 +6,40 @@ Physics-Informed Neural Networks (PINNs) are a class of machine learning models 
 # 1. Introduction
 
 ## 1.1 Motivation
+Traditional numerical methods for solving partial differential equations (PDEs), such as finite difference and finite element methods, can be computationally expensive and may struggle with high-dimensional problems or complex geometries. PINNs offer a promising alternative by leveraging the power of neural networks to approximate solutions to PDEs while incorporating physical knowledge directly into the learning process. 
+
+### 1.1.1 Finite Element Method (FEM) and Finite Difference Method (FDM)
+The Finite Element Method (FEM) is a broad numerical analysis method for solving partial differential equations. FEM subdivides a large problem into smaller, more managable parts called finite elements. This is done by discretizing the spatial domains into meshes, which can be of various shapes (e.g., triangles, quadrilaterals). The solution is approximated by minimizing some *error function* using calculus of variations. FEM is particularly effective for problems with complex geometries and boundary conditions.
+
+The Finite Difference Method (FDM) is a numerical technique for solving differential equations by approximating derivatives with finite differences. FDM discretizes the spatial and temporal domains into a grid and replaces the continuous derivatives in the PDEs with finite difference approximations. This method is straightforward and easy to implement, making it suitable for simple geometries and problems with regular grids. However, FDM can struggle with complex geometries and may require fine grids to achieve high accuracy, leading to increased computational costs.
+
+### 1.1.2 How PINNs differ from traditional numerical methods
+Firstly, PINNs leverage the universal function approximation capabilities of **neural networks** to learn complex relationships in data, while traditional numerical methods rely on discretization techniques to solve PDEs. PINNs can also handle high-dimensional problems and complex geometries more effectively than traditional methods, which may require significant computational resources for such cases. PINNs can incorporate noisy or incomplete data into the training process, allowing for more flexible modeling of real-world phenomena, whereas traditional methods typically require well-defined boundary conditions and initial conditions. Additonally, PINNs can be trained using gradient-based optimization algorithms, which can lead to faster convergence compared to iterative solvers used in traditional numerical methods.
 
 ## 1.2 Neural Network as Function Approximators
-$u_\theta(x,y,t)$ 
+$u_\theta(x,y,t)$ represents the neural network approximation of the solution to the PDE, where $\theta$ denotes the network parameters. The neural network takes the spatial coordinates $(x,y)$ and time $t$ as inputs and outputs the predicted solution $u_\theta$. This output is then compared to the true solution to compute the loss function. The total losses are a measure of the accuracy of the neural network in approximating the solution. During training, these losses are used to update the network parameters through backpropagation. The architecture of the neural network, including the number of layers, neurons, and activation functions, is designed to capture the underlying physics of the problem while ensuring that the model can learn effectively from the data. The choice of activation functions is crucial for enabling the network to learn complex patterns and relationships in the data, which is essential for accurately approximating the solution to the PDE. 
 
 
 ## 1.3 Neural Network Training
-Loss minimization, backpropagation, and optimization algorithms are key components of training neural networks. The loss function quantifies the difference between the predicted output and the true output, guiding the optimization process to adjust the network's parameters for improved performance. The backpropagation algorithm computes the gradients of the loss function with respect to the network's parameters, allowing for efficient updates during training. Optimization algorithms, such as stochastic gradient descent (SGD) or Adam, are used to iteratively minimize the loss function and enhance the model's accuracy.
+Loss minimization, backpropagation, and optimization algorithms are key components of training neural networks. 
+
+### 1.3.1 Loss function
+The loss function quantifies the difference between the predicted output and the true output, guiding the optimization process to adjust the network's parameters for improved performance. There are several contributing factors to the total loss of an output, including the data loss, physics loss, initial condition loss, and boundary condition loss. The data loss measures the discrepancy between the predicted solution and the observed data, while the physics loss quantifies how well the predicted solution satisfies the governing PDE. The initial condition loss and boundary condition loss ensure that the predicted solution adheres to the specified initial and boundary conditions, respectively. By **minimizing** this total loss during training, the neural network can learn to approximate the solution to the PDE while respecting the underlying physical constraints.
+
+### 1.3.2 Backpropagation
+The backpropagation algorithm computes the **gradients** of the loss function with respect to the network's parameters, allowing for efficient updates during training. This is done by applying the chain rule of calculus to propagate the error from the output layer back through the hidden layers to the input layer. The computed gradients are then used by optimization algorithms to adjust the parameters in a way that minimizes the loss function, ultimately improving the model's performance in approximating the solution to the PDE. To paraphase from **3Blue1Brown**, backpropagation is a method for efficiently computing the gradient of the loss function with respect to the parameters of the neural network, which is essential for training the model using gradient-based optimization algorithms.
+
+### 1.3.3 Optimization algorithms
+Optimization algorithms, such as stochastic gradient descent (SGD) or **Adam**, are used to iteratively minimize the loss function and enhance the model's accuracy. These algorithms adjust the network's parameters based on the computed gradients from backpropagation, allowing the model to learn from the data and improve its predictions over time. The choice of optimization algorithm can significantly impact the convergence speed and overall performance of the neural network, making it an important consideration in the training process. 
+
+Again, in the words of **3Blue1Brown**, the optimization algorithm is comparable to a hiker trying to find the lowest point in a landscape, where the loss function represents the landscape and the parameters of the neural network represent the hiker's position. The optimization algorithm guides the hiker towards the lowest point by following the gradients of the loss function, ultimately leading to a better approximation of the solution to the PDE. Certain factors, such as the choice of learning rate, can influence the effectiveness of the optimization algorithm, and require tuning to achieve optimal performance. These tuning parameters can make the hiker's decent very accurate, but slow, or very fast, but inefficient, and may even cause the hiker to diverge from the lowest point if not chosen carefully. **3Blue1Brown** compares it to a drunk man stubling down a hill versus a very careful and calculating gentleman that chooses his steps precisely. 
 
 ## 1.4 Physics-Informed Neural Networks (PINNs)
+The *physics-informed* aspect of PINNs refers to the incorporation of physical laws, such as conservation of energy or mass, into the training process. This is achieved by including terms in the loss function that penalize deviations from the governing PDEs, ensuring that the predicted solutions not only fit the data but also adhere to known physical principles. These losses can also be biased to prioritize certain aspects of the solution, such as fitting the data more closely or ensuring that the PDE is satisfied more accurately. By embedding physical knowledge directly into the training process, PINNs can achieve better generalization and robustness, especially in scenarios where data may be scarce or noisy (which is often the case in real-world applications). This approach allows PINNs to leverage both data and physics to learn complex relationships and make accurate predictions, making them a powerful tool for solving PDEs in various scientific and engineering domains.
 
 ## 1.5 Application, Advantages, and Limitations of PINNs
-- 2D Heat Equation
-- Gaussian initial conditions
-- Dirichlet and Neumann boundary conditions
+PINNs have been successfully applied to a wide range of problems in physics, engineering, and other scientific domains. They have been used to solve PDEs in fluid dynamics, heat transfer, electromagnetics, and many other areas. The advantages of PINNs include their ability to handle high-dimensional problems, incorporate physical knowledge directly into the training process, and learn from noisy or incomplete data. However, PINNs also have limitations, such as the need for careful tuning of hyperparameters, potential issues with convergence, and the requirement for sufficient computational resources for training. Despite these challenges, PINNs represent a promising approach for solving complex PDEs and have the potential to revolutionize the way we model and understand physical systems.
+
 
 
 # 2. Problem Formulation
@@ -151,3 +171,9 @@ The specific network architecture used in this project...
 
 
 # 8. Conclusion
+
+## 8.1 Summary of Findings
+
+## 8.2 Attribution
+https://en.wikipedia.org/wiki/Finite_element_method
+https://en.wikipedia.org/wiki/Finite_difference_method
