@@ -71,76 +71,390 @@ for Neumann boundary conditions, where $\frac{\partial u}{\partial n}$ denotes t
 
 
 ## 2.3 Analytical Solution
-The analytical solution to the 2D heat equation with Gaussian initial conditions can be derived using separation of variables and Fourier series. The solution is given by:
+The analytical solution to the **2D heat equation** with Gaussian initial conditions can be derived using separation of variables and Fourier series. The solution is given by:
 ```math
-u(x,y,t) = \frac{1}{4\pi \alpha t} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f(\xi,\eta) e^{-\frac{(x-\xi)^2 + (y-\eta)^2}{4\alpha t}} \mathrm{d}\xi \mathrm{d}\eta
+u(x,y,t) = 
 ```
 where $f(\xi,\eta)$ is the initial temperature distribution and where $\xi$ and $\eta$ are dummy variables of integration representing the spatial coordinates. This solution represents the evolution of the temperature distribution over time, starting from the initial Gaussian profile. The integral form of the solution indicates that the temperature at any point $(x,y)$ and time $t$ is influenced by the initial conditions across the entire spatial domain, weighted by a Gaussian kernel that accounts for the diffusion process. This analytical solution serves as a benchmark for evaluating the performance of PINNs in approximating the solution to the 2D heat equation under the specified conditions.
+
+## 2.3 Analytical Solution 
+
+To validate the Physics-Informed Neural Network (PINN), an analytical solution to the two-dimensional heat equation is constructed for the same domain and boundary conditions.
+
+
+### 2.3.1 Governing Equation
+
+The temperature field $u(x,y,t)$ satisfies the diffusion equation:
+```math
+\frac{\partial u}{\partial t} = \alpha \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right)
+```
+
+on the square domain $x,y \in [0,1]$, subject to homogeneous Neumann boundary conditions:
+
+```math
+\frac{\partial u}{\partial n} = 0 \quad \text{on all boundaries}
+```
+
+which physically correspond to an insulated domain (no heat flux across the boundary).
+
+     NOTE: The program can be easily modified to handle Dirichlet boundary conditions by changing the basis functions and eigenvalues accordingly. For the purposes of the report, focus will remain on the Neumann case, but remember that the code to implement the Dirichlet case is also available in the notebook, just commented out.
+
+---
+
+### 2.3.2 Separation of Variables and Eigenfunction Expansion
+
+Due to linearity and homogeneous boundary conditions, the solution may be expressed as a series of spatial eigenfunctions. For Neumann boundary conditions, the appropriate basis functions are cosine modes:
+
+```math
+\phi_{mn}(x,y) = \cos(m\pi x)\cos(n\pi y), \quad m,n = 0,1,2,\dots
+```
+
+Substituting a separable solution $u(x,y,t) = X(x)Y(y)T(t)$ into the governing equation leads to eigenvalues:
+
+```math
+\lambda_{mn} = \pi^2 (m^2 + n^2)
+```
+
+and exponential temporal decay of each mode. The general solution is therefore:
+
+```math
+u(x,y,t) = \sum_{m=0}^{\infty} \sum_{n=0}^{\infty}
+C_{mn}\,\cos(m\pi x)\cos(n\pi y)\,e^{-\alpha \pi^2 (m^2 + n^2)t}
+```
+
+---
+
+### 2.3.3 Determination of Coefficients
+
+The coefficients $C_{mn}$ are determined by projecting the initial condition onto the cosine basis:
+
+```math
+C_{mn} =
+\int_0^1 \int_0^1
+u(x,y,0)\,\cos(m\pi x)\cos(n\pi y)\,\mathrm{d}x\,\mathrm{d}y
+```
+
+For this project, the initial condition consists of two Gaussian peaks:
+
+```math
+u(x,y,0) =
+T_{\max}\,e^{-A[(x-0.3)^2 + (y-0.3)^2]} +
+T_{\max}\,e^{-A[(x-0.7)^2 + (y-0.7)^2]}
+```
+
+The integrals for $C_{mn}$ are evaluated numerically using a two-dimensional trapezoidal rule over a uniform grid.
+
+     NOTE: Although the discussion of solving for and implementing the analytical solution is interesting, it is not strictly necessary for the project, as the main focus is on the implementation and performance of the PINN. However, having an analytical solution provides a valuable benchmark for evaluating the accuracy of the PINN and understanding the underlying physics of the problem. The code to compute the analytical solution is included in the notebook for completeness, but it can be commented out if desired without affecting the core functionality of the PINN implementation.
+
+     NOTE: For the purposes of demonstrating the accuracy of the PINN, multiple unique initial conditions (and even boundary conditions) where implemented, tested, and reported on. For the sake of brevity, only one set of initial conditions (the two Gaussian peaks) is discussed in the report.
+
+---
+
+### 2.3.4 Numerical Implementation
+
+Since the infinite series is not tractable in practice, the solution is approximated by truncating the expansion:
+
+```math
+u(x,y,t) \approx
+\sum_{m=0}^{M} \sum_{n=0}^{N}
+C_{mn}\,\cos(m\pi x)\cos(n\pi y)\,e^{-\alpha \pi^2 (m^2 + n^2)t}
+```
+
+where $M$ and $N$ are chosen to balance accuracy and computational cost.
+
+To improve efficiency:
+- Coefficients $C_{mn}$ are precomputed once  
+- Spatial basis functions $\cos(m\pi x)\cos(n\pi y)$ are cached  
+- Time evolution is applied via exponential decay factors  
+
+---
+
+### 2.3.5 Physical Interpretation
+
+Each term in the series represents a spatial mode that:
+- Satisfies the boundary conditions exactly  
+- Decays exponentially in time  
+- Contributes to the overall diffusion process  
+
+This analytical solution is consistent with the imposed Neumann boundary conditions and serves as a physically accurate benchmark for evaluating the PINN. The truncation of the series introduces a controllable approximation error, which decreases as the number of retained modes increases.
 
 # 3. Architecture of PINNs
 
 ## 3.1 Neural Network Structure and Layers
 The architecture of a Physics-Informed Neural Network (PINN) typically consists of multiple layers, including an input layer, several hidden layers, and an output layer. The input layer receives the spatial and temporal coordinates (e.g., $x$, $y$, and $t$), while the output layer produces the predicted solution (e.g., temperature $u_\theta$). The hidden layers can be fully connected or may include other types of layers such as convolutional or recurrent layers, depending on the specific problem being addressed. The choice of *activation functions* in the hidden layers is crucial for capturing the non-linear relationships in the data and ensuring that the network can learn complex patterns effectively. 
 
-## 3.2 Activation Functions
-Common activation functions include `ReLU`, `sigmoid`, and `tanh`, each with its own advantages and disadvantages in terms of convergence and performance. The architecture of the PINN must be carefully designed to balance model complexity with computational efficiency, ensuring that it can accurately approximate the solution to the governing PDE while remaining tractable for training.
+<figure>
+  <img src="./Figures/Hidden Layers Diagram.png" style="width:50%">
+  <img src="./Figures/Input Output Layers Diagram.png" style="width:50%">
+  <figcaption><strong>Figure 1.</strong> Neural network visualization from Brody Codes AI.</figcaption> 
 
-WHY TANH?
-- smooth and differentiable, which is important for computing derivatives in the PDE loss
+  [Brody Codes AI](https://www.youtube.com/watch?v=WRSNrVH0wg8)
+</figure>
+
+
+## 3.2 Activation Functions
+
+Activation functions are mathematical functions applied to the output of each neuron in the hidden layers. Common activation functions include `ReLU`, `sigmoid`, and `tanh`, each with its own advantages and disadvantages in terms of convergence and performance. The `ReLU` activation function is computationally efficient and helps mitigate the vanishing gradient problem, but it can lead to dead neurons. The `sigmoid` function maps inputs to a range between 0 and 1, which can be useful for binary classification tasks but may suffer from vanishing gradients. The `tanh` function maps inputs to a range between -1 and 1, providing a zero-centered output that can help with convergence during training.
+
+Usually, when building a PINN, the `tanh` activation function is often chosen for the hidden layers due to its smoothness and differentiability, which are important for computing derivatives in the PDE loss. The `tanh` function allows the network to capture complex relationships in the data while ensuring that the gradients can be computed effectively during backpropagation, leading to better convergence and performance in approximating the solution to the PDE.
+
+     NOTE: The actual operation of activation functions in the (very involved) context of machine learning is a complex topic that is still an active area of research. The theory behind activation functions is beyond the scope of this project.
 
 ## 3.3 Automatic Differentiation
-Automatic differentiation is a key feature of PINNs that allows for the efficient computation of derivatives required for the PDE loss. This technique enables the network to compute gradients with respect to its parameters and inputs, facilitating the training process and ensuring that the physical constraints are properly enforced during optimization.
+Automatic differentiation is a process in which derivatives of functions (generally the loss function with respect to the network parameters) are computed automatically by the machine learning framework (e.g., PyTorch in this case). This is essential for training PINNs, as it allows for efficient computation of gradients needed for backpropagation. Automatic differentiation works by breaking down complex functions into a sequence of elementary operations and applying the chain rule of calculus to compute derivatives efficiently. This enables the PINN to *learn* from data while ensuring that the predicted solutions satisfy the governing PDEs, as the derivatives required for the physics-informed loss can be computed accurately and efficiently during training.
+
+This is a complex process that is still an active area of research, and the implementation methods vary depending on the machine learning framework being used. However, the key advantage of automatic differentiation is that it allows for the efficient computation of gradients. *Gradient descent* is a common term used for the *optimization* process in which these gradients are used to find some local minimum in the *loss landscape*. The inner workings of this process are beyond the scope of this report, but it is important to note that automatic differentiation is a fundamental component of the training process for PINNs and plays a critical role in their ability to solve PDEs accurately and efficiently.
+
 
 ## 3.4 Loss Function
 
+The training of a Physics-Informed Neural Network (PINN) is formulated as an optimization problem in which the neural network is trained to satisfy both observed data constraints and governing physical laws. This is achieved by constructing a composite loss function consisting of multiple physically motivated terms.
+
+In this implementation, the neural network approximates the temperature field, $u_\theta(x,y,t)$, and is trained such that it simultaneously:
+- Matches the initial condition data
+- Satisfies the heat equation
+- Enforces Neumann boundary conditions
+
+---
+
 ### 3.4.1 PDE Residual Loss
-The PDE residual loss quantifies how well the predicted solution satisfies the governing PDE. For the 2D heat equation, the PDE residual can be defined as:
+
+The governing equation for the system is the 2D heat equation:
 ```math
-r(x, y, t) = u_t - \alpha (u_{xx} + u_{yy})
+\frac{\partial u}{\partial t} = \alpha \left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right)
 ```
+
+The PINN enforces this constraint by minimizing the residual:
+```math
+r(x,y,t) = u_t - \alpha (u_{xx} + u_{yy})
+```
+
+In the code, this is implemented using automatic differentiation:
+```python
+u_x = grads[:,0:1]
+u_y = grads[:,1:2]
+u_t = grads[:,2:3]
+
+u_xx = torch.autograd.grad(...)[0][:,0:1]
+u_yy = torch.autograd.grad(...)[0][:,1:2]
+
+physics_loss = torch.mean((u_t - alpha * (u_xx + u_yy))**2)
+```
+
+This term ensures that the learned solution satisfies the governing PDE at randomly sampled collocation points in the domain.
+
+---
 
 ### 3.4.2 Initial Condition Loss
 
+The initial condition specifies the temperature distribution at $t = 0$ as two Gaussian peaks:
+```math
+u(x,y,0) = T_{\max} \left(e^{-A[(x-x_1)^2 + (y-y_1)^2]} + e^{-A[(x-x_2)^2 + (y-y_2)^2]}\right)
+```
+In the implementation, this is enforced by evaluating the neural network at $t=0$:
+```python
+u_pred_data = model(X_data)
+data_loss = torch.mean((u_pred_data - u_data)**2)
+```
+This term ensures that the predicted solution matches the specified initial temperature distribution.
+
+---
 ### 3.4.3 Boundary Condition Loss
 
-### 3.4.4 Total Loss
-The total loss function for training the PINN is a weighted sum of the PDE residual loss, initial condition loss, and boundary condition loss. This can be expressed as:
+The system enforces homogeneous Neumann boundary conditions:
 ```math
-\mathcal{L}_{\text{total}} = \lambda_{\text{data}} \mathcal{L}_{\text{data}} + \lambda_{\text{physics}} \mathcal{L}_{\text{physics}} + \lambda_{\text{IC}} \mathcal{L}_{\text{IC}} + \lambda_{\text{BC}} \mathcal{L}_{\text{BC}}
+\frac{\partial u}{\partial n} = 0 \quad \text{on all boundaries}
 ```
+This corresponds physically to an insulated domain where no heat flux leaves the system.
+
+Unlike Dirichlet conditions, Neumann conditions are enforced through spatial derivatives of the network output. Using automatic differentiation, the normal derivatives at the domain boundaries are computed:
 ```python
-loss = (lambda_data * data_loss)
-     + (lambda_phys * physics_loss)
-     + (lambda_ic * ic_loss)
-     + (lambda_bc * bc_loss)
+du_dx_left  = grad_left[:,0:1]
+du_dx_right = grad_right[:,0:1]
+du_dy_bottom = grad_bottom[:,1:2]
+du_dy_top    = grad_top[:,1:2]
 ```
+The boundary condition loss is then defined as the mean squared error of these derivatives:
+```python
+bc_loss = (
+    torch.mean(du_dx_left**2) +
+    torch.mean(du_dx_right**2) +
+    torch.mean(du_dy_bottom**2) +
+    torch.mean(du_dy_top**2)
+)
+```
+This term ensures that the predicted solution satisfies the Neumann boundary conditions, effectively modeling an insulated domain.
+
+---
+
+### 3.4.4 Total Loss
+
+The final objective function is a weighted sum of all constraints:
+```math
+\mathcal{L}_{\text{total}} = \lambda_{\text{data}} \mathcal{L}_{\text{data}} + \lambda_{\text{physics}} \mathcal{L}_{\text{physics}} + \lambda_{\text{BC}} \mathcal{L}_{\text{BC}}
+```
+Implemented in code as:
+```python
+loss = (lambda_data * data_loss) + 
+       (lambda_phys * physics_loss) +
+       (lambda_bc * bc_loss)
+```
+
+Each term plays a distinct role:
+- Data loss enforces the initial condition,
+- Physics loss enforces the PDE constraint,
+- Boundary loss enforces insulation conditions.
+
+The weighting coefficients $\lambda_i$ control the relative importance of each constraint and can significantly influence convergence behavior and solution accuracy.
+
 
 # 4. Implementation Details
 
+This section describes the computational implementation of the Physics-Informed Neural Network (PINN) used to solve the 2D heat equation, including the software framework, neural network design, and training procedure.
+
+
 ## 4.1 Software
-The implementation of the PINN for solving the 2D heat equation was carried out using Python, leveraging libraries such as `PyTorch` for building and training the neural network. These libraries provide powerful tools for automatic differentiation, optimization, and GPU acceleration, which are essential for efficiently training PINNs.
-- Autograd for automatic differentiation
-- Optimizers for training the network
-- Data handling and visualization tools
-- GPU support for faster computations
+The implementation was developed in Python using the **PyTorch** deep learning framework. PyTorch is particularly well-suited for PINNs due to its support for:
+- **Automatic differentiation (autograd)** for computing spatial and temporal derivatives of the neural network output
+- **Gradient-based optimization** for training the model
+- **Efficient tensor operations** for large-scale numerical computation
+- **GPU acceleration** (when available) for improved performance
+In this project, PyTorch is used to train the neural network but also to enforce the partial differential equation describing the physical phenomena.
+
+Supporting libraries include:
+- `NumPy` for numerical operations and analytical solution computation
+- `Matplotlib` for visualization and animation of results
+
+---
 
 ## 4.2 Network Architecture
-The specific network architecture used in this project...
-- changed it around though...
-### Number of Layers and Neurons
 
+The PINN approximates the temperature field, $u_\theta(x,y,t) $, using a fully connected feedforward neural network.
+
+### 4.2.1 Structure
+
+The implemented architecture consists of:
+
+- **Input layer:** 3 neurons \((x, y, t)\)
+- **Hidden layers:** 3 layers, each with 64 neurons
+- **Activation function:** Hyperbolic tangent (Tanh)
+- **Output layer:** 1 neuron representing \(u(x,y,t)\)
+
+Easily implemented in PyTorch as:
+```python
+class PINN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(3, 64),       # 3 input features: (x,y,t)
+            nn.Tanh(),              # Activation function: Tanh
+            nn.Linear(64, 64),      # Hidden layer with 64 neurons
+            nn.Tanh(),              # Activation function: Tanh
+            nn.Linear(64, 64),      # Hidden layer with 64 neurons
+            nn.Tanh(),              # Activation function: Tanh
+            nn.Linear(64, 1)        # 1 output feature: u(x,y,t)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+```
+
+### 4.2.2 Explanation of Design Choices
+
+Firstly, like many other aspects of this project, the network architecture is a free parameter that can be studied and tuned for optimal performance. Several structures were implemented and tested, including variations in the number of hidden layers, neurons per layer, and activation functions. The chosen architecture (3 hidden layers with 64 neurons each and Tanh activation) was found to provide a good balance between model capacity and training stability for this specific problem. 
+- The **Tanh activation function** is used because it produces smooth, differentiable outputs, which is essential for computing higher-order derivatives required in the PDE residual.
+- A moderate depth (3 hidden layers) is used to balance:
+  - Function approximation capacity
+  - Training stability
+  - Computational efficiency
+
+---
 
 ## 4.3 Training Methodology
 
+The training process is an interative process in which the neural network parameters (weighting matrixies, bias vectors, etc.) are updated to minimize the total loss function. The update is based on the computed gradients of the loss function and continues until a local minimum is reached or a specified number of `epochs` (complete passes through the training data) is completed.
+
 ### 4.3.1 Sampling Data Points
-> Explain the code used to create the intial contion points, boundary condition points, and collocation points. 
+
+Three distinct types of training points are used:
+
+1. Initial Condition Points
+     - These enforce the known solution at t=0.
+     - ```python
+          x_data = torch.rand(N_data, 1)
+          y_data = torch.rand(N_data, 1)
+          t_data = torch.zeros_like(x_data)    
+          X_data = torch.cat([x_data, y_data, t_data], dim=1)
+          u_data = initial_condition(x_data, y_data, A, temp_min, temp_max)
+       ```
+          - The initial condition is sampled at random spatial locations with time fixed at zero, ensuring that the neural network learns to match the specified initial temperature distribution.
+
+2. Collocation Points
+     - These points are used to enforce the PDE residual at random locations within the domain.
+     - ```python
+          N_col = 2000                                                # Number of collocation points (points used to enforce PDE)
+          x_col = torch.rand(N_col, 1)
+          y_col = torch.rand(N_col, 1)
+          t_col = tmax * torch.rand(N_col, 1)
+          X_col = torch.cat([x_col, y_col, t_col], dim=1)             # Combine x, y, and t for collocation points
+       ```
+          - Uniform random sampling across space-time domain is used to compute the PDE residual loss: $u_t - \alpha (u_{xx} + u_{yy})$ at these points, ensuring that the learned solution satisfies the governing PDE throughout the domain.
+
+3. Boundary Condition Points
+     - These enforce the Neumann boundary conditions at the domain boundaries.
+     - ```python
+          x0       = torch.zeros_like(t_bc)                           # Boundary condition at x=0
+          x1       = torch.ones_like(t_bc)                            # Boundary condition at x=1. torch.ones_like 
+          y_rand   = torch.rand(N_bc,1)                               # Random points in space for boundary conditions (y values for x=0 and x=1)
+
+          X_left   = torch.cat([x0, y_rand, t_bc], dim=1)             # Combine x=0, random y, and time for left boundary condition points
+          X_right  = torch.cat([x1, y_rand, t_bc], dim=1)             # Combine x=1, random y, and time for right boundary condition points
+
+          y0       = torch.zeros_like(t_bc)                           # Boundary condition at y=0
+          y1       = torch.ones_like(t_bc)                            # Boundary condition at y=1
+          x_rand   = torch.rand(N_bc,1)                               # Random points in space for boundary conditions (x values for y=0 and y=1)
+
+          X_bottom = torch.cat([x_rand, y0, t_bc], dim=1)             # Combine random x, y=0, and time for bottom boundary condition points
+          X_top    = torch.cat([x_rand, y1, t_bc], dim=1)             # Combine random x, y=1, and time for top boundary condition points
+       ```
+          - Random sampling along the boundaries ensures that the Neumann conditions are enforced across the entire boundary, rather than just at a few fixed points, leading to a more accurate representation of the insulated domain.
 
 ### 4.3.2 Training Process
-#### Optimizer
-#### Learning rate
+
+#### Optimizer and Learning Rate
+The **Adam** optimizer is used for training the PINN, which is a popular choice for training deep learning models due to its adaptive learning rate and momentum properties. The optimizer updates the network parameters based on the computed gradients of the loss function, allowing for efficient convergence towards a local minimum.
+```python
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+```
+This optimizer differs from the classic stochastic gradient descent (`SGD`) by maintaining a moving average of the gradients and their squares, which helps to stabilize the training process and often leads to faster convergence. These features are often referred to as "adaptive learning rates" and "momentum", respectively, and can help the model navigate the loss landscape more effectively, especially in cases where the loss function is complex or has many local minima.
+
+The learning rate of `0.001` is a common default choice for the Adam optimizer, but it can be tuned based on the specific problem and dataset to achieve better performance. 
+
 #### Epochs
+The training process is run for a specified number of epochs, which represents the number of complete passes through the training data. In this implementation, the model is trained for `10,000` epochs. Each of which consists of:
+- Forward pass: The input data is passed through the network to compute the predicted solution.
+- Loss computation: The total loss is computed based on the data loss, physics loss, and boundary condition loss.
+- Backward pass: The gradients of the loss with respect to the network parameters are computed using backpropagation.
+- Parameter update: The optimizer updates the network parameters based on the computed gradients.
 
 ### 4.3.3 Boundary Condition Enforcement
+The Neumann boundary conditions are enforced by computing the derivatives of the network output at the boundaries and including these in the loss function. The computed derivatives are then used to define a boundary condition loss term that penalizes deviations from the specified Neumann conditions, ensuring that the learned solution satisfies the physical constraints of an insulated box.
+```python
+du_dx_left  = grad_left[:,0:1]
+du_dx_right = grad_right[:,0:1]
+du_dy_bottom = grad_bottom[:,1:2]
+du_dy_top    = grad_top[:,1:2]
+```
+Then the boundary condition loss is defined as:
+```python
+bc_loss = (
+    torch.mean(du_dx_left**2) +
+    torch.mean(du_dx_right**2) +
+    torch.mean(du_dy_bottom**2) +
+    torch.mean(du_dy_top**2)
+)
+```
+
 
 
 # 5. Summary of PINN
