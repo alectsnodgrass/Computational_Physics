@@ -140,7 +140,26 @@ sol = solve_ivp(
     t_eval = np.linspace(0, T_final, Nt)
     )
 ```
-Finally, we can start creating some animated simulations. 
+We can then extract our solutions and reshape them accordingly to minimc our original structure. 
+```python
+U_list = [sol.y[:N*N,k].reshape((N,N)) for k in range(0, Nt)]
+V_list = [sol.y[N*N:,k].reshape((N,N)) for k in range(0, Nt)]
+```
+Where Nt is the number of frames we wanted to compite. Finally, we can start creating animated simulations for some PDEs. A good starting example is the heat equation that was used when demonstrating the method. 
+```math
+\begin{aligned}
+\partial_t \, u = \alpha^2 \, \nabla^2 \, u
+\end{aligned}
+```
+We only need one function, so in our code we can simply update U while setting the derivatives for V to be an array of zeros. 
+```python
+alpha = 2
+def F(t, U, V):
+    dU_dt = alpha**2 * Laplacian_9pt(U, h)
+    dV_dt = np.zeros_like(V)
+```
+In 2D, with periodic BCs and ICs fixing some non-zero temperature at certain point, we get a simulation like the following. 
+
 
 
 
