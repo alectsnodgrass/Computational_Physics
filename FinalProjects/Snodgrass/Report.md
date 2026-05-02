@@ -468,24 +468,53 @@ bc_loss = (
 
 ---
 
-# 5. Results and Validation
+# 5. Results and Performance Analysis
 
+## 5.1 Visual Comparison of Predicted and Analytical Solutions
 Before explaining the accuracy, convergence, and stability of the PINN, it is helpful to visualize the predicted solutions. The following figures show the temperature distribution predicted by the PINN at various time steps, compared to the analytical solution. As seen below, the model is quite visually convincing.
+
+https://github.com/user-attachments/assets/cacaed5a-ea91-4142-b913-71304236383e
 
 <figure>
   <figcaption><strong>Figure 2.</strong> Temperature distribution predicted by the PINN at various time steps, compared to the analytical solution.</figcaption> 
 </figure>
 
+---
 
 ## 5.2 Quantitative Error Analysis
 
-https://github.com/user-attachments/assets/cacaed5a-ea91-4142-b913-71304236383e
+### 5.2.1 L2 Error Metric
+
+To quantitatively evaluate the accuracy of the PINN, the L2 error norm is used to measure the discrepancy between the predicted solution and the analytical solution over the spatial domain.
+
+Let $ u_{\text{PINN}}(x,y,t) $ denote the neural network prediction and $ u_{\text{true}}(x,y,t) $ the analytical solution. The error field is defined as:
+```math
+e(x,y,t) = u_{\text{PINN}}(x,y,t) - u_{\text{true}}(x,y,t)
+```
+The continuous L2 norm of the error over the domain Ω is given by:
+```math
+\|e(t)\|_{L^2} = \left( \int_{\Omega} |e(x,y,t)|^2 \, \mathrm{d}\Omega \right)^{1/2}
+```
+In practice, this integral is approximated using numerical quadrature over a discrete grid of points:
+```math
+\|e(t)\|_{L^2} \approx \left( \frac{1}{N} \sum_{i=1}^{N} |e(x_i,y_i,t)|^2 \right)^{1/2}
+```
+
+This cooresponds to the root mean square error (RMSE) between the predicted and true solutions at time $ t $. L2 error is a common metric for evaluating PINNs, because it provides a single scalar value that quantifies the overall discrepancy between the predicted and true solutions, making it easier to compare different models and training configurations. Additionally, the L2 norm is sensitive to large differences (because of the squared term), which can be important for assessing the performance of PINNs in capturing the underlying physics of the problem.
+
+### 5.2.2 Error Evolution Over Time
+Plotting the L2 error over time provides insight into how the accuracy of the PINN evolves as the solution changes, and can help identify any trends or issues in the training process.
 
 <figure>
+  <img src="./Figures/l2_error_vs_time.png" style="width:60%">
   <figcaption><strong>Figure 3.</strong> L2 relative error over time.</figcaption> 
 </figure>
 
-## 5.3 Training Behavior and Convergence
+With the standard model (3 layers, 64 neurons in each layer, learning rate of 0.001, tanh activation function, 7,000 epochs...), the accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2. The error increases slightly over time, which is expected due to the nature of the diffusion process and the accumulation of approximation errors. However, the overall low error indicates that the PINN is successfully learning to approximate the solution to the 2D heat equation under the specified initial and boundary conditions.
+
+---
+
+## 5.3 Training and Convergence Behavior
 
 <figure>
   <img src="./Figures/raw_loss_plot.png" style="width:60%">
@@ -508,6 +537,7 @@ https://github.com/user-attachments/assets/bf353794-9318-4391-8f64-f782c93860be
      <figcaption><strong>Figure 5.</strong> Epochs: 10,000 vs 1,000 vs 500. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
 </figure>
 
+---
 
 https://github.com/user-attachments/assets/8ffd8262-a7f2-4d9e-9945-d785d17d5c59
 
@@ -519,6 +549,8 @@ https://github.com/user-attachments/assets/a880111c-97f0-421a-948b-01e13d974aae
      <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
 </figure>
 
+---
+
 https://github.com/user-attachments/assets/601d35c6-efdb-4e67-9e99-b070c290d28f
 
 https://github.com/user-attachments/assets/87bb3451-23e0-4e04-b694-a4f000a39b35
@@ -528,6 +560,8 @@ https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
 <figure>
      <figcaption><strong>Figure 7.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
 </figure>
+
+---
 
 https://github.com/user-attachments/assets/470a12a7-da6f-4198-a283-32079ca179ce
 
@@ -541,42 +575,54 @@ https://github.com/user-attachments/assets/fcc5d236-18d5-4472-94d0-e82c95d825bf
 
 ---
 
-# 6. Performance and Sensitivity Analysis
-
-## 6.1 Evaluation Metrics
-- MSE (training loss)
-- L2 relative error
-- Physics residual magnitude
-
-## 6.2 Computational Efficiency
-- Training time
-- Cost of analytical solution (Fourier series)
-- Tradeoff: accuracy vs computation
-
-## 6.4 Sources of Error
-- Spectral truncation (analytical solution)
-- PINN approximation limits
-- Sampling bias
+<figure>
+     <figcaption><strong>Figure 9.</strong> Collocation points: 500 vs 100. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer, 3 hidden layers.</figcaption>
+</figure>
 
 ---
 
-# 7. Discussion
+### 5.4.1 Observations
 
-## 7.1 What the PINN Successfully Captures
-- Diffusion dynamics
-- Boundary behavior (Neumann conditions)
-- Generalization in space-time
+The model is strongly affected by the structure of the network and the training process parameters. There is often a tradeoff between accuracy and computational efficiency, as more complex architectures and longer training times can lead to better approximations of the solution, but at the cost of increased computational resources and time. For example, increasing the number of epochs generally leads to improved accuracy, but with diminishing returns after a certain point. Similarly, increasing the number of neurons per layer can enhance the model's capacity to learn complex patterns, but may also lead to overfitting if not properly regularized. The learning rate is another critical hyperparameter that can influence convergence; too high a learning rate may cause the model to diverge, while too low a learning rate can result in slow convergence. The number of collocation points also plays a significant role in the accuracy of the PINN, as more collocation points can provide a better representation of the PDE residual across the domain, but at the cost of increased computational time for training. There is some fine tuning needed to find the optimal "sweet-spot" for a specific physics problem. 
 
-## 7.2 Limitations of the PINN
-- Does not explicitly "solve" the PDE
-     - Learns an approximation that minimizes the PDE residual, but may not satisfy it exactly
-- Requires careful tuning
-- Can struggle with high-frequency modes
+---
 
-## 7.3 Practical Implications
-- When PINNs are useful
-- When classical solvers are preferable
+## 5.5 Computational Efficiency and Error
 
-## 7.4 Attribution
-https://en.wikipedia.org/wiki/Finite_element_method
-https://en.wikipedia.org/wiki/Finite_difference_method
+### 5.5.1 Computational Cost
+The training time for the PINN is $\mathcal{O}(\text{epochs} \cdot N_{collocation})$. Meaning the training time for the PINN is directly tied the number of epochs and the number of collocation points used to enforce the PDE residual. The computational cost of the analytical solution, which involves evaluating a truncated Fourier series, is $\mathcal{O}(M \cdot N)$, where $M$ and $N$ are the number of modes retained in the series expansion. There is a tradeoff between accuracy and computational efficiency, as increasing the number of epochs, neurons, hidden layers, or collocation points can lead to improved accuracy but also increases the computational resources and time required for training.
+
+Ideally, this method for approximating solutions to a physical phenomena would be compared to another method such as FEM or FDM. However, due to time constraints, this was not implemented. The accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2, but without a direct comparison to a classical numerical method, it is difficult to fully assess the computational efficiency and error of the PINN in relation to traditional approaches.
+- With a few simple modifications, the model produced an L2 error on the order of 1e-3, while only requiring eight minutes of training time (instead of 3-4 minutes), demonstrating the tradeoff between accuracy and efficiency. While this is a significant improvement in accuracy for very little additional training time, it is important to note that this error-training time tradeoff is not linear, and may vary depending on the specific problem, network architecture, and training parameters.
+
+
+<figure>
+     <img src="./Figures/l2_error_vs_time_better.png" style="width:60%">
+     <figcaption><strong>Figure 10.</strong> Improved error model.</figcaption>
+</figure>
+
+### 5.5.2 Sources of error
+- Approximation error from the neural network architecture (limited capacity to represent complex functions)
+- Optimization error (local minima, convergence issues)
+- Numerical error in computing derivatives via automatic differentiation
+- Truncation error in the analytical solution (finite number of modes)
+- Sampling error from finite collocation points
+- Hyperparameter sensitivity and tuning
+- Computational precision (floating-point errors)
+- PINN approximation limits
+- Sampling bias
+
+
+---
+
+# 6. Discussion
+
+The PINN successfully captures the key physical phenomena of the 2D heat equation, including diffusion dynamics, boundary behavior, time evolution, and the initial conditions. To be clear, the PINN does not explicitly "solve" the PDE in the traditional sense, but rather learns an approximation that minimizes the PDE residual across the domain. This allows the PINN to generalize well in space and time and make accurate predictions at random locations and future time steps. However, there are limitations to this approach, including the need for careful tuning of hyperparameters, potential difficulties in capturing high-frequency modes, the fact that the learned solution may not satisfy the PDE exactly at all points, and the increase in error over time due to the diffusive nature of the problem. In practice, PINNs can be a powerful tool for solving PDEs when traditional numerical methods are infeasible or when data is available, but they may not always be the best choice for every problem, especially when high precision is required or when computational resources are limited. The way this PINN is constructed, an evolving physical system may require the PINN to *re-learn* a new solution based on the new conditions. This would add an extremely large computational cost to the problem, and may not be feasible for real-time applications. In contrast, classical numerical solvers can often be more efficient for solving PDEs with fixed conditions, but may struggle with complex geometries or data-driven problems where PINNs can excel.
+
+
+# 7. Attribution
+
+[FEM](https://en.wikipedia.org/wiki/Finite_element_method)
+
+[FDM](https://en.wikipedia.org/wiki/Finite_difference_method)
+
