@@ -160,7 +160,7 @@ def F(t, U, V):
 ```
 In 2D, with periodic BCs and ICs fixing some non-zero temperature at certain point, we get a simulation like the following. 
 
-
+![Heat Equation](Heat_Eqn_Periodic.gif)
 
 
 
