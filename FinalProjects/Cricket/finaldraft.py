@@ -43,16 +43,16 @@ def rk45(initial_state, magnets):
     )
     return solution
 
-# Computes the distance from a given point to each magnet. Determines which magnet is closest. 
+# Computes the distance from a given point to each magnet. Determines which magnet is closest.
 # Index of closest magnet is returned to classify a basin of attraction.
 def find_closest_magnet(x, y, magnets):
     distances = [np.sqrt((x - m[0])**2 + (y - m[1])**2) for m in magnets]
     return np.argmin(distances)
 
-# Creates grid of inital conditions. Runs through each point, and figures out which magnet the trajectory 
-# leads to. Result is stored as a 2D array. 
+# Creates grid of inital conditions. Runs through each point, and figures out which magnet the trajectory
+# leads to. Result is stored as a 2D array.
 def generate_fast_fractal(magnets, res=400, max_iter=400):
-    
+
     # vectorized grid instead of nested loops
     x = np.linspace(-1.5, 1.5, res)
     y = np.linspace(-1.5, 1.5, res)
@@ -149,7 +149,7 @@ for i, j in enumerate(solutions):
     ax.set_xlim(-1.5, 1.5)
     ax.set_ylim(-1.5, 1.5)
 
-plt.suptitle("Magnetic Pendulum Trajectories")
+plt.suptitle("Magnetic Pendulum Trajectories (3 Magnets)")
 plt.show()
 
 # generate the fractal
@@ -157,7 +157,7 @@ print("\nGenerating fractal...\n")
 
 
 basins, shading = generate_fast_fractal(magnets3, res=500)
-colors = ['#800080', '#FFD700', '#0000FF']
+colors = ['#582c83', '#FFD100', '#76d7f5'] # I picked these. Wings up!
 custom_cmap = ListedColormap(colors)
 plt.figure(figsize=(10, 10))
 
@@ -172,25 +172,185 @@ plt.imshow(shading, cmap='bone',
            origin='lower', alpha=0.3)
 
 plt.axis('off')
-plt.title("Magnetic Pendulum Fractal (3 Magnets)", color='white')
-plt.gcf().set_facecolor('black')
+plt.title("Magnetic Pendulum Fractal (3 Magnets)", color='black')
+plt.gcf().set_facecolor('white')
 
 # plot magnets
 for m in magnets3:
     plt.scatter(m[0], m[1], color='white', s=60)
+print("")
 plt.show()
 
 
 # extension one (4 magnets)
 
 # place four magnets on the ends of a square
-# magnets4 = [np.array([1, 0]),
-#             np.array([1, 1]),
-#             np.array([0, 1]),
-#             np.array([0, 0])]
+magnets4 = [np.array([0.5, 0.5]),
+            np.array([0.5, -0.5]),
+            np.array([-0.5, -0.5]),
+            np.array([-0.5, 0.5])]
+
+# reset initial lists and change a few variables
+restoring = 0.1  
+magnetic_strength = 2.0
+initial_conditions, solutions = [], []
 
 
-# extension two (5 magnets)
+# randomly generate initial conditions
+for _ in range(4):
+    x0 = ra.uniform(-1.5, 1.5)
+    y0 = ra.uniform(-1.5, 1.5)
+    vx0 = ra.uniform(-0.1, 0.1)
+    vy0 = ra.uniform(-0.1, 0.1)
+    initial_conditions.append([x0, y0, vx0, vy0])
+
+for i in initial_conditions:
+    ans = rk45(i, magnets4)
+    solutions.append(ans)
+
+# plot motion
+fig, axes = plt.subplots(1, len(solutions), figsize=(5*len(solutions), 5))
+for i, j in enumerate(solutions):
+    ax = axes[i]
+    x = j.y[0]
+    y = j.y[1]
+
+    ax.plot(x, y, lw=0.7)
+
+    for m in magnets4:
+        ax.scatter(m[0], m[1], color='red', s=50, zorder=4)
+
+    ic = initial_conditions[i]
+    ax.set_title(
+        f"x0={ic[0]:.2f}, y0={ic[1]:.2f}\n"
+        f"vx0={ic[2]:.2f}, vy0={ic[3]:.2f}"
+    )
+
+    ax.set_aspect('equal')
+    ax.grid(alpha=0.3)
+    ax.set_xlim(-1.5, 1.5)
+    ax.set_ylim(-1.5, 1.5)
+
+plt.suptitle("Magnetic Pendulum Trajectories (4 Magnets)")
+print("")
+plt.show()
+
+# generate the fractal
+print("\nGenerating fractal...\n")
+
+
+basins, shading = generate_fast_fractal(magnets4, res=500)
+colors = ['#FF512B', '#CDFF42', '#FC3DB9', '#1EF7BA'] # colors picked by my friend Nolan! 
+custom_cmap = ListedColormap(colors)
+plt.figure(figsize=(10, 10))
+
+# base colors
+plt.imshow(basins, cmap=custom_cmap,
+           extent=[-1.5, 1.5, -1.5, 1.5],
+           origin='lower')
+
+# shading layer for fractal texture
+plt.imshow(shading, cmap='bone',
+           extent=[-1.5, 1.5, -1.5, 1.5],
+           origin='lower', alpha=0.3)
+
+plt.axis('off')
+plt.title("Magnetic Pendulum Fractal (4 Magnets)", color='black')
+plt.gcf().set_facecolor('white')
+
+# plot magnets
+for m in magnets4:
+    plt.scatter(m[0], m[1], color='white', s=60)
+print("")
+plt.show()
+
+# extension two (5 magnets) ############################################################################
+
+N = 5    # number of sides
+R = 1.0  # radius (distance from origin)
+
+magnets5 = [
+    np.array([
+        R * np.cos(2*np.pi*k/N),
+        R * np.sin(2*np.pi*k/N)
+    ])
+    for k in range(N)
+]
+
+# reset initial lists and change a few variables # MAY CHANGE LATER!!!!!!!!!!!!!
+restoring = 0.1  
+magnetic_strength = 2.0
+initial_conditions, solutions = [], []
+
+
+# randomly generate initial conditions
+for _ in range(5):
+    x0 = ra.uniform(-1.5, 1.5)
+    y0 = ra.uniform(-1.5, 1.5)
+    vx0 = ra.uniform(-0.1, 0.1)
+    vy0 = ra.uniform(-0.1, 0.1)
+    initial_conditions.append([x0, y0, vx0, vy0])
+
+for i in initial_conditions:
+    ans = rk45(i, magnets5)
+    solutions.append(ans)
+
+# plot motion
+fig, axes = plt.subplots(1, len(solutions), figsize=(5*len(solutions), 5))
+for i, j in enumerate(solutions):
+    ax = axes[i]
+    x = j.y[0]
+    y = j.y[1]
+    ax.plot(x, y, lw=0.7)
+
+    for m in magnets5:
+        ax.scatter(m[0], m[1], color='red', s=50, zorder=4)
+
+    ic = initial_conditions[i]
+    ax.set_title(
+        f"x0={ic[0]:.2f}, y0={ic[1]:.2f}\n"
+        f"vx0={ic[2]:.2f}, vy0={ic[3]:.2f}"
+    )
+
+    ax.set_aspect('equal')
+    ax.grid(alpha=0.3)
+    ax.set_xlim(-1.5, 1.5)
+    ax.set_ylim(-1.5, 1.5)
+
+plt.suptitle("Magnetic Pendulum Trajectories (5 Magnets)")
+print("")
+plt.show()
+
+# generate the fractal
+print("\nGenerating fractal...\n")
+
+
+basins, shading = generate_fast_fractal(magnets5, res=500)
+colors = ['#0E7526', '#5C2807', '#5D7285', '#DB730B', '#00B3FF'] # colors picked by Eli! 
+custom_cmap = ListedColormap(colors)
+plt.figure(figsize=(10, 10))
+
+# base colors
+plt.imshow(basins, cmap=custom_cmap,
+           extent=[-1.5, 1.5, -1.5, 1.5],
+           origin='lower')
+
+# shading layer for fractal texture
+plt.imshow(shading, cmap='bone',
+           extent=[-1.5, 1.5, -1.5, 1.5],
+           origin='lower', alpha=0.3)
+
+plt.axis('off')
+plt.title("Magnetic Pendulum Fractal (5 Magnets)", color='black')
+plt.gcf().set_facecolor('white')
+
+# plot magnets
+for m in magnets5:
+    plt.scatter(m[0], m[1], color='white', s=60)
+plt.show()
+
+
+# extension 3 (3 magnets, moving magnets)
 
 #################################################################
 # END FINAL PROJECT
