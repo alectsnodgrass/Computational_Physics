@@ -468,52 +468,57 @@ bc_loss = (
 
 # 5. Results and Validation
 
-## 5.1 Visualization of Predicted Solutions
-
 Before explaining the accuracy, convergence, and stability of the PINN, it is helpful to visualize the predicted solutions. The following figures show the temperature distribution predicted by the PINN at various time steps, compared to the analytical solution. As seen below, the model is quite visually convincing.
 
-<video controls src="5sec_hot-cold-1.mp4" title="Title"></video>
-
 <figure>
-     <!-- <video controls src="5sec_hot-cold.mp4" title="Title"></video> -->
-     <figcaption><strong>Figure 2.</strong> Epochs: 10,000 vs 1,000. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
-</figure>
-
-
-
-<figure>
-     <figcaption><strong>Figure 3.</strong> Learning rate: 0.001 vs 0.005. Other PINN parameters: 1,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
-</figure>
-
-
-
-
-<figure>
-     <figcaption><strong>Figure 4.</strong> Neurons per layer: 128 vs 64 vs 16. Other PINN parameters: 10,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
-</figure>
-
-
-
-
-<figure>
-     <figcaption><strong>Figure 5.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 10,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
+  <figcaption><strong>Figure 2.</strong> Temperature distribution predicted by the PINN at various time steps, compared to the analytical solution.</figcaption> 
 </figure>
 
 
 ## 5.2 Quantitative Error Analysis
-- Pointwise error: |u_PINN - u_true|
-- L2 norm over domain
-- Error evolution over time
+
+
+<figure>
+  <img src="./Figures/l2_error_plot.png" style="width:60%">
+  <figcaption><strong>Figure 3.</strong> L2 relative error over time.</figcaption> 
+</figure>
 
 ## 5.3 Training Behavior and Convergence
 
 <figure>
   <img src="./Figures/raw_loss_plot.png" style="width:60%">
   <img src="./Figures/smoothed_loss_plot.png" style="width:60%">
-  <figcaption><strong>Figure 6.</strong> Training loss curves (raw and smoothed). Model converges towards a minimum loss value over time.</figcaption> 
+  <figcaption><strong>Figure 4.</strong> Training loss curves (raw and smoothed). Model converges towards a minimum loss value over time.</figcaption> 
 </figure>
 
 As seen in the loss curves above, the training process shows a steady decrease in the total loss over time, indicating that the model is learning to satisfy the data, physics, and boundary constraints. The raw loss curve exhibits some noise due to the stochastic nature of the optimization process, while the smoothed curve provides a clearer view of the overall convergence trend. The model appears to converge towards a minimum loss value, suggesting that it is successfully learning to approximate the solution to the 2D heat equation under the specified conditions.
+
+## 5.4 Sensitivity to Hyperparameters
+
+
+
+<figure>
+     <!-- <video controls src="5sec_hot-cold.mp4" title="Title"></video> -->
+     <figcaption><strong>Figure 5.</strong> Epochs: 10,000 vs 1,000 vs 500. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
+</figure>
+
+
+
+<figure>
+     <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
+</figure>
+
+
+
+<figure>
+     <figcaption><strong>Figure 7.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
+</figure>
+
+
+
+<figure>
+     <figcaption><strong>Figure 8.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
+</figure>
 
 ---
 
@@ -528,12 +533,6 @@ As seen in the loss curves above, the training process shows a steady decrease i
 - Training time
 - Cost of analytical solution (Fourier series)
 - Tradeoff: accuracy vs computation
-
-## 6.3 Sensitivity to Hyperparameters
-- Number of layers / neurons
-- Learning rate
-- Number of collocation points
-- Loss weights (λ terms)
 
 ## 6.4 Sources of Error
 - Spectral truncation (analytical solution)
