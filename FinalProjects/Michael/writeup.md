@@ -157,11 +157,36 @@ alpha = 2
 def F(t, U, V):
     dU_dt = alpha**2 * Laplacian_9pt(U, h)
     dV_dt = np.zeros_like(V)
+    return [dU_dt, dV_dt]
 ```
 In 2D, with periodic BCs and ICs fixing some non-zero temperature at certain point, we get a simulation like the following. 
 
 ![Heat Equation](Heat_Eqn_Periodic.gif)
 
+This looks very reasonable! The heat equation is the canoncial example of a diffusion system, which is exactly the behavior the simulation has demonstrated. The next problem we can to try is the wave equation. 
+```math
+\begin{gathered}
+\partial_t^2 \, u = \alpha^2 \, \nabla^2 \, u
+\end{gathered}
+```
+We need to do some more work to adapt this to the program. The system must be expressed as a coupled set of PDEs that are first order in time. 
+```math
+\begin{gathered}
+\text{Let } \, v = \partial_t \, u \\
+\text{Thus }\, \partial_t \begin{pmatrix} u \\ v \end{pmatrix} = \begin{pmatrix} v \\  \nabla^2 \, u  \end{pmatrix}
+\end{gathered}
+```
+So, V in our code represents the velocity at each point of U. The system is expressed in the following way.
+```python
+alpha = 2
+def F(t, U, V):
+    dU_dt = V
+    dV_dt =  alpha**2 * Laplacian_9pt(U, h)
+    return [dU_dt, dV_dt]
+```
+Then, with the same conditions as before, the simulation produces the following animation. 
+
+![Wave Equation](Wave_Eqn_Periodic.gif)
 
 
 ## Old Stuff from the outline
