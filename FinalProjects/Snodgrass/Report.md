@@ -479,9 +479,9 @@ Before explaining the accuracy, convergence, and stability of the PINN, it is he
 
 ## 5.2 Quantitative Error Analysis
 
+https://github.com/user-attachments/assets/cacaed5a-ea91-4142-b913-71304236383e
 
 <figure>
-  <img src="./Figures/l2_error_plot.png" style="width:60%">
   <figcaption><strong>Figure 3.</strong> L2 relative error over time.</figcaption> 
 </figure>
 
