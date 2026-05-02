@@ -3,6 +3,8 @@
 # Abstract
 Physics-Informed Neural Networks (PINNs) are a class of machine learning models that integrate physical laws into the training process. By embedding the governing mathematical equations of physical systems directly into the loss function, PINNs can learn complex relationships from data while adhering to known physical constraints. This project studies the architecture of PINNs, their training methodologies, and their applications in solving problems in physics.
 
+---
+
 # 1. Introduction
 
 ## 1.1 Motivation
@@ -13,8 +15,10 @@ The Finite Element Method (FEM) is a broad numerical analysis method for solving
 
 The Finite Difference Method (FDM) is a numerical technique for solving differential equations by approximating derivatives with finite differences. FDM discretizes the spatial and temporal domains into a grid and replaces the continuous derivatives in the PDEs with finite difference approximations. This method is straightforward and easy to implement, making it suitable for simple geometries and problems with regular grids. However, FDM can struggle with complex geometries and may require fine grids to achieve high accuracy, leading to increased computational costs.
 
+
 ### 1.1.2 How PINNs differ from traditional numerical methods
 Firstly, PINNs leverage the universal function approximation capabilities of **neural networks** to learn complex relationships in data, while traditional numerical methods rely on discretization techniques to solve PDEs. PINNs can also handle high-dimensional problems and complex geometries more effectively than traditional methods, which may require significant computational resources for such cases. PINNs can incorporate noisy or incomplete data into the training process, allowing for more flexible modeling of real-world phenomena, whereas traditional methods typically require well-defined boundary conditions and initial conditions. Additonally, PINNs can be trained using gradient-based optimization algorithms, which can lead to faster convergence compared to iterative solvers used in traditional numerical methods.
+
 
 ## 1.2 Neural Network as Function Approximators
 $u_\theta(x,y,t)$ represents the neural network approximation of the solution to the PDE, where $\theta$ denotes the network parameters. The neural network takes the spatial coordinates $(x,y)$ and time $t$ as inputs and outputs the predicted solution $u_\theta$. This output is then compared to the true solution to compute the loss function. The total losses are a measure of the accuracy of the neural network in approximating the solution. During training, these losses are used to update the network parameters through backpropagation. The architecture of the neural network, including the number of layers, neurons, and activation functions, is designed to capture the underlying physics of the problem while ensuring that the model can learn effectively from the data. The choice of activation functions is crucial for enabling the network to learn complex patterns and relationships in the data, which is essential for accurately approximating the solution to the PDE. 
@@ -34,13 +38,15 @@ Optimization algorithms, such as stochastic gradient descent (SGD) or **Adam**, 
 
 Again, in the words of **3Blue1Brown**, the optimization algorithm is comparable to a hiker trying to find the lowest point in a landscape, where the loss function represents the landscape and the parameters of the neural network represent the hiker's position. The optimization algorithm guides the hiker towards the lowest point by following the gradients of the loss function, ultimately leading to a better approximation of the solution to the PDE. Certain factors, such as the choice of learning rate, can influence the effectiveness of the optimization algorithm, and require tuning to achieve optimal performance. These tuning parameters can make the hiker's decent very accurate, but slow, or very fast, but inefficient, and may even cause the hiker to diverge from the lowest point if not chosen carefully. **3Blue1Brown** compares it to a drunk man stubling down a hill versus a very careful and calculating gentleman that chooses his steps precisely. 
 
+
 ## 1.4 Physics-Informed Neural Networks (PINNs)
 The *physics-informed* aspect of PINNs refers to the incorporation of physical laws, such as conservation of energy or mass, into the training process. This is achieved by including terms in the loss function that penalize deviations from the governing PDEs, ensuring that the predicted solutions not only fit the data but also adhere to known physical principles. These losses can also be biased to prioritize certain aspects of the solution, such as fitting the data more closely or ensuring that the PDE is satisfied more accurately. By embedding physical knowledge directly into the training process, PINNs can achieve better generalization and robustness, especially in scenarios where data may be scarce or noisy (which is often the case in real-world applications). This approach allows PINNs to leverage both data and physics to learn complex relationships and make accurate predictions, making them a powerful tool for solving PDEs in various scientific and engineering domains.
+
 
 ## 1.5 Application, Advantages, and Limitations of PINNs
 PINNs have been successfully applied to a wide range of problems in physics, engineering, and other scientific domains. They have been used to solve PDEs in fluid dynamics, heat transfer, electromagnetics, and many other areas. The advantages of PINNs include their ability to handle high-dimensional problems, incorporate physical knowledge directly into the training process, and learn from noisy or incomplete data. However, PINNs also have limitations, such as the need for careful tuning of hyperparameters, potential issues with convergence, and the requirement for sufficient computational resources for training. Despite these challenges, PINNs represent a promising approach for solving complex PDEs and have the potential to revolutionize the way we model and understand physical systems.
 
-
+---
 
 # 2. Problem Formulation
 
@@ -178,6 +184,8 @@ Each term in the series represents a spatial mode that:
 
 This analytical solution is consistent with the imposed Neumann boundary conditions and serves as a physically accurate benchmark for evaluating the PINN. The truncation of the series introduces a controllable approximation error, which decreases as the number of retained modes increases.
 
+---
+
 # 3. Architecture of PINNs
 
 ## 3.1 Neural Network Structure and Layers
@@ -307,6 +315,7 @@ Each term plays a distinct role:
 
 The weighting coefficients $\lambda_i$ control the relative importance of each constraint and can significantly influence convergence behavior and solution accuracy.
 
+---
 
 # 4. Implementation Details
 
@@ -455,39 +464,101 @@ bc_loss = (
 )
 ```
 
+---
+
+# 5. Results and Validation
+
+## 5.1 Visualization of Predicted Solutions
+
+Before explaining the accuracy, convergence, and stability of the PINN, it is helpful to visualize the predicted solutions. The following figures show the temperature distribution predicted by the PINN at various time steps, compared to the analytical solution. As seen below, the model is quite visually convincing.
+
+<video controls src="5sec_hot-cold-1.mp4" title="Title"></video>
+
+<figure>
+     <!-- <video controls src="5sec_hot-cold.mp4" title="Title"></video> -->
+     <figcaption><strong>Figure 2.</strong> Epochs: 10,000 vs 1,000. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
+</figure>
 
 
-# 5. Summary of PINN
 
-## 5.1 What does a PINN do?
-
-## 5.2 What does a PINN **not** do?
-
-
-# 6. Accuracy and Performance Evaluation
-
-## 6.1 Metrics for Evaluating PINN Performance
-
-## 6.2 Comparison with Analytical Solution
-
-## 6.3 Computational Efficiency
-
-## 6.4 Sensitivity Analysis
+<figure>
+     <figcaption><strong>Figure 3.</strong> Learning rate: 0.001 vs 0.005. Other PINN parameters: 1,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
+</figure>
 
 
-# 7. Results
-
-## 7.1 Visualization of Predicted Solutions
-
-## 7.2 Training Curves and Convergence Analysis
-
-## 7.3 Error Analysis
 
 
-# 8. Conclusion
+<figure>
+     <figcaption><strong>Figure 4.</strong> Neurons per layer: 128 vs 64 vs 16. Other PINN parameters: 10,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
+</figure>
 
-## 8.1 Summary of Findings
 
-## 8.2 Attribution
+
+
+<figure>
+     <figcaption><strong>Figure 5.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 10,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
+</figure>
+
+
+## 5.2 Quantitative Error Analysis
+- Pointwise error: |u_PINN - u_true|
+- L2 norm over domain
+- Error evolution over time
+
+## 5.3 Training Behavior and Convergence
+
+<figure>
+  <img src="./Figures/raw_loss_plot.png" style="width:60%">
+  <img src="./Figures/smoothed_loss_plot.png" style="width:60%">
+  <figcaption><strong>Figure 6.</strong> Training loss curves (raw and smoothed). Model converges towards a minimum loss value over time.</figcaption> 
+</figure>
+
+As seen in the loss curves above, the training process shows a steady decrease in the total loss over time, indicating that the model is learning to satisfy the data, physics, and boundary constraints. The raw loss curve exhibits some noise due to the stochastic nature of the optimization process, while the smoothed curve provides a clearer view of the overall convergence trend. The model appears to converge towards a minimum loss value, suggesting that it is successfully learning to approximate the solution to the 2D heat equation under the specified conditions.
+
+---
+
+# 6. Performance and Sensitivity Analysis
+
+## 6.1 Evaluation Metrics
+- MSE (training loss)
+- L2 relative error
+- Physics residual magnitude
+
+## 6.2 Computational Efficiency
+- Training time
+- Cost of analytical solution (Fourier series)
+- Tradeoff: accuracy vs computation
+
+## 6.3 Sensitivity to Hyperparameters
+- Number of layers / neurons
+- Learning rate
+- Number of collocation points
+- Loss weights (λ terms)
+
+## 6.4 Sources of Error
+- Spectral truncation (analytical solution)
+- PINN approximation limits
+- Sampling bias
+
+---
+
+# 7. Discussion
+
+## 7.1 What the PINN Successfully Captures
+- Diffusion dynamics
+- Boundary behavior (Neumann conditions)
+- Generalization in space-time
+
+## 7.2 Limitations of the PINN
+- Does not explicitly "solve" the PDE
+     - Learns an approximation that minimizes the PDE residual, but may not satisfy it exactly
+- Requires careful tuning
+- Can struggle with high-frequency modes
+
+## 7.3 Practical Implications
+- When PINNs are useful
+- When classical solvers are preferable
+
+## 7.4 Attribution
 https://en.wikipedia.org/wiki/Finite_element_method
 https://en.wikipedia.org/wiki/Finite_difference_method
