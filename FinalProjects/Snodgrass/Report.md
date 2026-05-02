@@ -498,30 +498,43 @@ As seen in the loss curves above, the training process shows a steady decrease i
 ## 5.4 Sensitivity to Hyperparameters
 
 https://github.com/user-attachments/assets/51d1487e-8efe-491e-8e40-8aefe91185ff
+
 https://github.com/user-attachments/assets/63027eaa-abf1-4886-9350-9a9cf41f9d45
+
 https://github.com/user-attachments/assets/bf353794-9318-4391-8f64-f782c93860be
+
 <figure>
      <!-- <video controls src="5sec_hot-cold.mp4" title="Title"></video> -->
      <figcaption><strong>Figure 5.</strong> Epochs: 10,000 vs 1,000 vs 500. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
 </figure>
 
+
 https://github.com/user-attachments/assets/8ffd8262-a7f2-4d9e-9945-d785d17d5c59
+
 https://github.com/user-attachments/assets/41566e93-22f7-4b1a-89d6-d8bfe1958dd2
+
 https://github.com/user-attachments/assets/a880111c-97f0-421a-948b-01e13d974aae
+
 <figure>
      <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
 </figure>
 
 https://github.com/user-attachments/assets/601d35c6-efdb-4e67-9e99-b070c290d28f
+
 https://github.com/user-attachments/assets/87bb3451-23e0-4e04-b694-a4f000a39b35
+
 https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
+
 <figure>
      <figcaption><strong>Figure 7.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
 </figure>
 
 https://github.com/user-attachments/assets/470a12a7-da6f-4198-a283-32079ca179ce
+
 https://github.com/user-attachments/assets/3f283529-b843-46ef-9617-b4188cc542f4
+
 https://github.com/user-attachments/assets/fcc5d236-18d5-4472-94d0-e82c95d825bf
+
 <figure>
      <figcaption><strong>Figure 8.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
 </figure>
