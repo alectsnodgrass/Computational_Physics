@@ -549,6 +549,14 @@ https://github.com/user-attachments/assets/a880111c-97f0-421a-948b-01e13d974aae
      <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
 </figure>
 
+The learning rate can also greatly affect the convergence behavior. At high learning rates, it is possible that the local minima could be overshot to the point that it is hard for the network to find a new minima in the *loss landscape*. 
+
+<figure>
+  <img src="./Figures/raw_loss_bad_lr.png" style="width:60%">
+  <img src="./Figures/smoothed_loss_bad_lr.png" style="width:60%">
+  <figcaption><strong>Figure 7.</strong> Convergence behavior with a poorly choosen learning rate.</figcaption> 
+</figure>
+
 ---
 
 https://github.com/user-attachments/assets/601d35c6-efdb-4e67-9e99-b070c290d28f
@@ -558,7 +566,7 @@ https://github.com/user-attachments/assets/87bb3451-23e0-4e04-b694-a4f000a39b35
 https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
 
 <figure>
-     <figcaption><strong>Figure 7.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
+     <figcaption><strong>Figure 8.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
 </figure>
 
 ---
@@ -570,14 +578,20 @@ https://github.com/user-attachments/assets/3f283529-b843-46ef-9617-b4188cc542f4
 https://github.com/user-attachments/assets/fcc5d236-18d5-4472-94d0-e82c95d825bf
 
 <figure>
-     <figcaption><strong>Figure 8.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
+     <figcaption><strong>Figure 9.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
 </figure>
 
 ---
 
+https://github.com/user-attachments/assets/c328af9b-0ada-4c74-bc31-ab89eac8cf83
+
+https://github.com/user-attachments/assets/d8499d8a-fd62-46c4-8886-7e23f0130b88
+
 <figure>
-     <figcaption><strong>Figure 9.</strong> Collocation points: 500 vs 100. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer, 3 hidden layers.</figcaption>
+     <figcaption><strong>Figure 10.</strong> Collocation points: 500 vs 100. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer, 3 hidden layers.</figcaption>
 </figure>
+
+     For context, $N_{Collocation}=2,000$ was used for most of the results in the report
 
 ---
 
@@ -595,10 +609,11 @@ The training time for the PINN is $\mathcal{O}(\text{epochs} \cdot N_{collocatio
 Ideally, this method for approximating solutions to a physical phenomena would be compared to another method such as FEM or FDM. However, due to time constraints, this was not implemented. The accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2, but without a direct comparison to a classical numerical method, it is difficult to fully assess the computational efficiency and error of the PINN in relation to traditional approaches.
 - With a few simple modifications, the model produced an L2 error on the order of 1e-3, while only requiring eight minutes of training time (instead of 3-4 minutes), demonstrating the tradeoff between accuracy and efficiency. While this is a significant improvement in accuracy for very little additional training time, it is important to note that this error-training time tradeoff is not linear, and may vary depending on the specific problem, network architecture, and training parameters.
 
+https://github.com/user-attachments/assets/4167ed15-7926-44c4-ab47-c8c477699b68
 
 <figure>
      <img src="./Figures/l2_error_vs_time_better.png" style="width:60%">
-     <figcaption><strong>Figure 10.</strong> Improved error model.</figcaption>
+     <figcaption><strong>Figure 11.</strong> Improved error model.</figcaption>
 </figure>
 
 ### 5.5.2 Sources of error
