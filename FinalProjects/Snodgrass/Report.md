@@ -525,6 +525,7 @@ With the standard model (3 layers, 64 neurons in each layer, learning rate of 0.
 As seen in the loss curves above, the training process shows a steady decrease in the total loss over time, indicating that the model is learning to satisfy the data, physics, and boundary constraints. The raw loss curve exhibits some noise due to the stochastic nature of the optimization process, while the smoothed curve provides a clearer view of the overall convergence trend. The model appears to converge towards a minimum loss value, suggesting that it is successfully learning to approximate the solution to the 2D heat equation under the specified conditions.
 
 ## 5.4 Sensitivity to Hyperparameters
+### 5.4.1 Effect of Epochs
 
 https://github.com/user-attachments/assets/51d1487e-8efe-491e-8e40-8aefe91185ff
 
@@ -538,6 +539,8 @@ https://github.com/user-attachments/assets/bf353794-9318-4391-8f64-f782c93860be
 </figure>
 
 ---
+
+### 5.4.2 Effect of Learning Rate
 
 https://github.com/user-attachments/assets/8ffd8262-a7f2-4d9e-9945-d785d17d5c59
 
@@ -559,6 +562,8 @@ The learning rate can also greatly affect the convergence behavior. At high lear
 
 ---
 
+### 5.4.3 Effect of Neurons per Layer
+
 https://github.com/user-attachments/assets/601d35c6-efdb-4e67-9e99-b070c290d28f
 
 https://github.com/user-attachments/assets/87bb3451-23e0-4e04-b694-a4f000a39b35
@@ -571,6 +576,8 @@ https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
 
 ---
 
+### 5.4.4 Effect of Hidden Layer Count
+
 https://github.com/user-attachments/assets/470a12a7-da6f-4198-a283-32079ca179ce
 
 https://github.com/user-attachments/assets/3f283529-b843-46ef-9617-b4188cc542f4
@@ -582,6 +589,8 @@ https://github.com/user-attachments/assets/fcc5d236-18d5-4472-94d0-e82c95d825bf
 </figure>
 
 ---
+
+### 5.4.5 Effect of Collocation Points
 
 https://github.com/user-attachments/assets/c328af9b-0ada-4c74-bc31-ab89eac8cf83
 
