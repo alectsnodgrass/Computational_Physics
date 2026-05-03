@@ -1,5 +1,4 @@
 
-
 # **Physics-Informed Neural Networks (PINNs)**
 
 # Abstract
@@ -13,18 +12,15 @@ Physics-Informed Neural Networks (PINNs) are a class of machine learning models 
 Traditional numerical methods for solving partial differential equations (PDEs), such as finite difference and finite element methods, can be computationally expensive and may struggle with high-dimensional problems or complex geometries. PINNs offer a promising alternative by leveraging the power of neural networks to approximate solutions to PDEs while incorporating physical knowledge directly into the learning process. 
 
 ### 1.1.1 Finite Element Method (FEM) and Finite Difference Method (FDM)
-The Finite Element Method (FEM) is a broad numerical analysis method for solving partial differential equations. FEM subdivides a large problem into smaller, more managable parts called finite elements. This is done by discretizing the spatial domains into meshes, which can be of various shapes (e.g., triangles, quadrilaterals). The solution is approximated by minimizing some *error function* using calculus of variations. FEM is particularly effective for problems with complex geometries and boundary conditions.
+The Finite Element Method (FEM) is a broad numerical analysis method for solving partial differential equations. FEM subdivides a large problem into smaller, more manageable parts called finite elements. This is done by discretizing the spatial domains into meshes, which can be of various shapes (e.g., triangles, quadrilaterals). The solution is approximated by minimizing some *error function* using calculus of variations. FEM is particularly effective for problems with complex geometries and boundary conditions.
 
 The Finite Difference Method (FDM) is a numerical technique for solving differential equations by approximating derivatives with finite differences. FDM discretizes the spatial and temporal domains into a grid and replaces the continuous derivatives in the PDEs with finite difference approximations. This method is straightforward and easy to implement, making it suitable for simple geometries and problems with regular grids. However, FDM can struggle with complex geometries and may require fine grids to achieve high accuracy, leading to increased computational costs.
 
-
 ### 1.1.2 How PINNs differ from traditional numerical methods
-Firstly, PINNs leverage the universal function approximation capabilities of **neural networks** to learn complex relationships in data, while traditional numerical methods rely on discretization techniques to solve PDEs. PINNs can also handle high-dimensional problems and complex geometries more effectively than traditional methods, which may require significant computational resources for such cases. PINNs can incorporate noisy or incomplete data into the training process, allowing for more flexible modeling of real-world phenomena, whereas traditional methods typically require well-defined boundary conditions and initial conditions. Additonally, PINNs can be trained using gradient-based optimization algorithms, which can lead to faster convergence compared to iterative solvers used in traditional numerical methods.
-
+Firstly, PINNs leverage the universal function approximation capabilities of **neural networks** to learn complex relationships in data, while traditional numerical methods rely on discretization techniques to solve PDEs. PINNs can also handle high-dimensional problems and complex geometries more effectively than traditional methods, which may require significant computational resources for such cases. PINNs can incorporate noisy or incomplete data into the training process, allowing for more flexible modeling of real-world phenomena, whereas traditional methods typically require well-defined boundary conditions and initial conditions. Additionally, PINNs can be trained using gradient-based optimization algorithms, which can lead to faster convergence compared to iterative solvers used in traditional numerical methods.
 
 ## 1.2 Neural Network as Function Approximators
 $u_\theta(x,y,t)$ represents the neural network approximation of the solution to the PDE, where $\theta$ denotes the network parameters. The neural network takes the spatial coordinates $(x,y)$ and time $t$ as inputs and outputs the predicted solution $u_\theta$. This output is then compared to the true solution to compute the loss function. The total losses are a measure of the accuracy of the neural network in approximating the solution. During training, these losses are used to update the network parameters through backpropagation. The architecture of the neural network, including the number of layers, neurons, and activation functions, is designed to capture the underlying physics of the problem while ensuring that the model can learn effectively from the data. The choice of activation functions is crucial for enabling the network to learn complex patterns and relationships in the data, which is essential for accurately approximating the solution to the PDE. 
-
 
 ## 1.3 Neural Network Training
 Loss minimization, backpropagation, and optimization algorithms are key components of training neural networks. 
@@ -33,17 +29,15 @@ Loss minimization, backpropagation, and optimization algorithms are key componen
 The loss function quantifies the difference between the predicted output and the true output, guiding the optimization process to adjust the network's parameters for improved performance. There are several contributing factors to the total loss of an output, including the data loss, physics loss, initial condition loss, and boundary condition loss. The data loss measures the discrepancy between the predicted solution and the observed data, while the physics loss quantifies how well the predicted solution satisfies the governing PDE. The initial condition loss and boundary condition loss ensure that the predicted solution adheres to the specified initial and boundary conditions, respectively. By **minimizing** this total loss during training, the neural network can learn to approximate the solution to the PDE while respecting the underlying physical constraints.
 
 ### 1.3.2 Backpropagation
-The backpropagation algorithm computes the **gradients** of the loss function with respect to the network's parameters, allowing for efficient updates during training. This is done by applying the chain rule of calculus to propagate the error from the output layer back through the hidden layers to the input layer. The computed gradients are then used by optimization algorithms to adjust the parameters in a way that minimizes the loss function, ultimately improving the model's performance in approximating the solution to the PDE. To paraphase from **3Blue1Brown**, backpropagation is a method for efficiently computing the gradient of the loss function with respect to the parameters of the neural network, which is essential for training the model using gradient-based optimization algorithms.
+The backpropagation algorithm computes the **gradients** of the loss function with respect to the network's parameters, allowing for efficient updates during training. This is done by applying the chain rule of calculus to propagate the error from the output layer back through the hidden layers to the input layer. The computed gradients are then used by optimization algorithms to adjust the parameters in a way that minimizes the loss function, ultimately improving the model's performance in approximating the solution to the PDE. To paraphrase from **3Blue1Brown**, backpropagation is a method for efficiently computing the gradient of the loss function with respect to the parameters of the neural network, which is essential for training the model using gradient-based optimization algorithms.
 
 ### 1.3.3 Optimization algorithms
 Optimization algorithms, such as stochastic gradient descent (SGD) or **Adam**, are used to iteratively minimize the loss function and enhance the model's accuracy. These algorithms adjust the network's parameters based on the computed gradients from backpropagation, allowing the model to learn from the data and improve its predictions over time. The choice of optimization algorithm can significantly impact the convergence speed and overall performance of the neural network, making it an important consideration in the training process. 
 
-Again, in the words of **3Blue1Brown**, the optimization algorithm is comparable to a hiker trying to find the lowest point in a landscape, where the loss function represents the landscape and the parameters of the neural network represent the hiker's position. The optimization algorithm guides the hiker towards the lowest point by following the gradients of the loss function, ultimately leading to a better approximation of the solution to the PDE. Certain factors, such as the choice of learning rate, can influence the effectiveness of the optimization algorithm, and require tuning to achieve optimal performance. These tuning parameters can make the hiker's decent very accurate, but slow, or very fast, but inefficient, and may even cause the hiker to diverge from the lowest point if not chosen carefully. **3Blue1Brown** compares it to a drunk man stubling down a hill versus a very careful and calculating gentleman that chooses his steps precisely. 
-
+Again, in the words of **3Blue1Brown**, the optimization algorithm is comparable to a hiker trying to find the lowest point in a landscape, where the loss function represents the landscape and the parameters of the neural network represent the hiker's position. The optimization algorithm guides the hiker towards the lowest point by following the gradients of the loss function, ultimately leading to a better approximation of the solution to the PDE. Certain factors, such as the choice of learning rate, can influence the effectiveness of the optimization algorithm and require tuning to achieve optimal performance. These tuning parameters can make the hiker's decent very accurate, but slow, or very fast, but inefficient, and may even cause the hiker to diverge from the lowest point if not chosen carefully. **3Blue1Brown** compares it to a drunk man stumbling down a hill versus a very careful and calculating gentleman who chooses his steps precisely. 
 
 ## 1.4 Physics-Informed Neural Networks (PINNs)
-The *physics-informed* aspect of PINNs refers to the incorporation of physical laws, such as conservation of energy or mass, into the training process. This is achieved by including terms in the loss function that penalize deviations from the governing PDEs, ensuring that the predicted solutions not only fit the data but also adhere to known physical principles. These losses can also be biased to prioritize certain aspects of the solution, such as fitting the data more closely or ensuring that the PDE is satisfied more accurately. By embedding physical knowledge directly into the training process, PINNs can achieve better generalization and robustness, especially in scenarios where data may be scarce or noisy (which is often the case in real-world applications). This approach allows PINNs to leverage both data and physics to learn complex relationships and make accurate predictions, making them a powerful tool for solving PDEs in various scientific and engineering domains.
-
+The *physics-informed* aspect of PINNs refers to the incorporation of physical laws, such as conservation of energy or mass, into the training process. This is achieved by including terms in the loss function that penalizes deviations from the governing PDEs, ensuring that the predicted solutions not only fit the data but also adhere to known physical principles. These losses can also be biased to prioritize certain aspects of the solution, such as fitting the data more closely or ensuring that the PDE is satisfied more accurately. By embedding physical knowledge directly into the training process, PINNs can achieve better generalization and robustness, especially in scenarios where data may be scarce or noisy (which is often the case in real-world applications). This approach allows PINNs to leverage both data and physics to learn complex relationships and make accurate predictions, making them a powerful tool for solving PDEs in various scientific and engineering domains.
 
 ## 1.5 Application, Advantages, and Limitations of PINNs
 PINNs have been successfully applied to a wide range of problems in physics, engineering, and other scientific domains. They have been used to solve PDEs in fluid dynamics, heat transfer, electromagnetics, and many other areas. The advantages of PINNs include their ability to handle high-dimensional problems, incorporate physical knowledge directly into the training process, and learn from noisy or incomplete data. However, PINNs also have limitations, such as the need for careful tuning of hyperparameters, potential issues with convergence, and the requirement for sufficient computational resources for training. Despite these challenges, PINNs represent a promising approach for solving complex PDEs and have the potential to revolutionize the way we model and understand physical systems.
@@ -53,7 +47,7 @@ PINNs have been successfully applied to a wide range of problems in physics, eng
 # 2. Problem Formulation
 
 ## 2.1 Governing Equations
-The two dimensional heat equation is given by:
+The two-dimensional heat equation is given by:
 ```math
 \frac{\partial u}{\partial t} = \alpha \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right)
 ```
@@ -77,18 +71,7 @@ Which fix the temperature at the boundaries to zero. On the other hand, the Neum
 ```
 for Neumann boundary conditions, where $\frac{\partial u}{\partial n}$ denotes the derivative of $u$ normal to the boundary. This condition implies that there is no heat flux across the boundaries, meaning that the temperature gradient normal to the boundary is zero. The choice of boundary conditions depends on the physical scenario being modeled and can significantly influence the solution of the PDE. In this project, both types of boundary conditions are studied to demonstrate the versatility of PINNs in solving PDEs under different constraints.
 
-
-## 2.3 Analytical Solution
-The analytical solution to the **2D heat equation** with Gaussian initial conditions can be derived using separation of variables and Fourier series. The solution is given by:
-```math
-u(x,y,t) = 
-```
-where $f(\xi,\eta)$ is the initial temperature distribution and where $\xi$ and $\eta$ are dummy variables of integration representing the spatial coordinates. This solution represents the evolution of the temperature distribution over time, starting from the initial Gaussian profile. The integral form of the solution indicates that the temperature at any point $(x,y)$ and time $t$ is influenced by the initial conditions across the entire spatial domain, weighted by a Gaussian kernel that accounts for the diffusion process. This analytical solution serves as a benchmark for evaluating the performance of PINNs in approximating the solution to the 2D heat equation under the specified conditions.
-
-## 2.3 Analytical Solution 
-
 To validate the Physics-Informed Neural Network (PINN), an analytical solution to the two-dimensional heat equation is constructed for the same domain and boundary conditions.
-
 
 ### 2.3.1 Governing Equation
 
@@ -154,7 +137,7 @@ The integrals for $C_{mn}$ are evaluated numerically using a two-dimensional tra
 
      NOTE: Although the discussion of solving for and implementing the analytical solution is interesting, it is not strictly necessary for the project, as the main focus is on the implementation and performance of the PINN. However, having an analytical solution provides a valuable benchmark for evaluating the accuracy of the PINN and understanding the underlying physics of the problem. The code to compute the analytical solution is included in the notebook for completeness, but it can be commented out if desired without affecting the core functionality of the PINN implementation.
 
-     NOTE: For the purposes of demonstrating the accuracy of the PINN, multiple unique initial conditions (and even boundary conditions) where implemented, tested, and reported on. For the sake of brevity, only one set of initial conditions (the two Gaussian peaks) is discussed in the report.
+     NOTE: For the purposes of demonstrating the accuracy of the PINN, multiple unique initial conditions (and even boundary conditions) were implemented, tested, and reported on. For the sake of brevity, only one set of initial conditions (the two Gaussian peaks) is discussed in the report.
 
 ---
 
@@ -191,7 +174,7 @@ This analytical solution is consistent with the imposed Neumann boundary conditi
 # 3. Architecture of PINNs
 
 ## 3.1 Neural Network Structure and Layers
-The architecture of a Physics-Informed Neural Network (PINN) typically consists of multiple layers, including an input layer, several hidden layers, and an output layer. The input layer receives the spatial and temporal coordinates (e.g., $x$, $y$, and $t$), while the output layer produces the predicted solution (e.g., temperature $u_\theta$). The hidden layers can be fully connected or may include other types of layers such as convolutional or recurrent layers, depending on the specific problem being addressed. The choice of *activation functions* in the hidden layers is crucial for capturing the non-linear relationships in the data and ensuring that the network can learn complex patterns effectively. 
+The architecture of a Physics-Informed Neural Network (PINN) typically consists of multiple layers, including an input layer, several hidden layers, and an output layer. The input layer receives spatial and temporal coordinates (e.g., $x$, $y$, and $t$), while the output layer produces the predicted solution (e.g., temperature $u_\theta$). The hidden layers can be fully connected or may include other types of layers, such as convolutional or recurrent layers, depending on the specific problem being addressed. The choice of *activation functions* in the hidden layers is crucial for capturing the non-linear relationships in the data and ensuring that the network can learn complex patterns effectively. 
 
 <figure>
   <img src="./Figures/Hidden Layers Diagram.png" style="width:50%">
@@ -200,7 +183,6 @@ The architecture of a Physics-Informed Neural Network (PINN) typically consists 
 
   [Brody Codes AI](https://www.youtube.com/watch?v=WRSNrVH0wg8)
 </figure>
-
 
 ## 3.2 Activation Functions
 
@@ -211,10 +193,9 @@ Usually, when building a PINN, the `tanh` activation function is often chosen fo
      NOTE: The actual operation of activation functions in the (very involved) context of machine learning is a complex topic that is still an active area of research. The theory behind activation functions is beyond the scope of this project.
 
 ## 3.3 Automatic Differentiation
-Automatic differentiation is a process in which derivatives of functions (generally the loss function with respect to the network parameters) are computed automatically by the machine learning framework (e.g., PyTorch in this case). This is essential for training PINNs, as it allows for efficient computation of gradients needed for backpropagation. Automatic differentiation works by breaking down complex functions into a sequence of elementary operations and applying the chain rule of calculus to compute derivatives efficiently. This enables the PINN to *learn* from data while ensuring that the predicted solutions satisfy the governing PDEs, as the derivatives required for the physics-informed loss can be computed accurately and efficiently during training.
+Automatic differentiation is a process in which derivatives of functions (the loss function with respect to the network parameters) are computed automatically by the machine learning framework (e.g., PyTorch, in this case). This is essential for training PINNs, as it allows for efficient computation of gradients needed for backpropagation. Automatic differentiation works by breaking down complex functions into a sequence of elementary operations and applying the chain rule of calculus to compute derivatives efficiently. This enables the PINN to *learn* from data while ensuring that the predicted solutions satisfy the governing PDEs, as the derivatives required for the physics-informed loss can be computed accurately and efficiently during training.
 
 This is a complex process that is still an active area of research, and the implementation methods vary depending on the machine learning framework being used. However, the key advantage of automatic differentiation is that it allows for the efficient computation of gradients. *Gradient descent* is a common term used for the *optimization* process in which these gradients are used to find some local minimum in the *loss landscape*. The inner workings of this process are beyond the scope of this report, but it is important to note that automatic differentiation is a fundamental component of the training process for PINNs and plays a critical role in their ability to solve PDEs accurately and efficiently.
-
 
 ## 3.4 Loss Function
 
@@ -323,14 +304,13 @@ The weighting coefficients $\lambda_i$ control the relative importance of each c
 
 This section describes the computational implementation of the Physics-Informed Neural Network (PINN) used to solve the 2D heat equation, including the software framework, neural network design, and training procedure.
 
-
 ## 4.1 Software
 The implementation was developed in Python using the **PyTorch** deep learning framework. PyTorch is particularly well-suited for PINNs due to its support for:
 - **Automatic differentiation (autograd)** for computing spatial and temporal derivatives of the neural network output
 - **Gradient-based optimization** for training the model
 - **Efficient tensor operations** for large-scale numerical computation
 - **GPU acceleration** (when available) for improved performance
-In this project, PyTorch is used to train the neural network but also to enforce the partial differential equation describing the physical phenomena.
+In this project, PyTorch is used to train the neural network, but also to enforce the partial differential equation describing the physical phenomena.
 
 Supporting libraries include:
 - `NumPy` for numerical operations and analytical solution computation
@@ -373,7 +353,7 @@ class PINN(nn.Module):
 ### 4.2.2 Explanation of Design Choices
 
 Firstly, like many other aspects of this project, the network architecture is a free parameter that can be studied and tuned for optimal performance. Several structures were implemented and tested, including variations in the number of hidden layers, neurons per layer, and activation functions. The chosen architecture (3 hidden layers with 64 neurons each and Tanh activation) was found to provide a good balance between model capacity and training stability for this specific problem. 
-- The **Tanh activation function** is used because it produces smooth, differentiable outputs, which is essential for computing higher-order derivatives required in the PDE residual.
+- The **Tanh activation function** is used because it produces smooth, differentiable outputs, which are essential for computing higher-order derivatives required in the PDE residual.
 - A moderate depth (3 hidden layers) is used to balance:
   - Function approximation capacity
   - Training stability
@@ -383,7 +363,7 @@ Firstly, like many other aspects of this project, the network architecture is a 
 
 ## 4.3 Training Methodology
 
-The training process is an interative process in which the neural network parameters (weighting matrixies, bias vectors, etc.) are updated to minimize the total loss function. The update is based on the computed gradients of the loss function and continues until a local minimum is reached or a specified number of `epochs` (complete passes through the training data) is completed.
+The training process is an iterative process in which the neural network parameters (weight matrices, bias vectors, etc.) are updated to minimize the total loss function. The update is based on the computed gradients of the loss function and continues until a local minimum is reached or a specified number of `epochs` (complete passes through the training data) is completed.
 
 ### 4.3.1 Sampling Data Points
 
@@ -500,10 +480,10 @@ In practice, this integral is approximated using numerical quadrature over a dis
 \|e(t)\|_{L^2} \approx \left( \frac{1}{N} \sum_{i=1}^{N} |e(x_i,y_i,t)|^2 \right)^{1/2}
 ```
 
-This cooresponds to the root mean square error (RMSE) between the predicted and true solutions at time $ t $. L2 error is a common metric for evaluating PINNs, because it provides a single scalar value that quantifies the overall discrepancy between the predicted and true solutions, making it easier to compare different models and training configurations. Additionally, the L2 norm is sensitive to large differences (because of the squared term), which can be important for assessing the performance of PINNs in capturing the underlying physics of the problem.
+This corresponds to the root mean square error (RMSE) between the predicted and true solutions at time $ t $. L2 error is a common metric for evaluating PINNs, because it provides a single scalar value that quantifies the overall discrepancy between the predicted and true solutions, making it easier to compare different models and training configurations. Additionally, the L2 norm is sensitive to large differences (because of the squared term), which can be important for assessing the performance of PINNs in capturing the underlying physics of the problem.
 
 ### 5.2.2 Error Evolution Over Time
-Plotting the L2 error over time provides insight into how the accuracy of the PINN evolves as the solution changes, and can help identify any trends or issues in the training process.
+Plotting the L2 error over time provides insight into how the accuracy of the PINN evolves as the solution changes and can help identify any trends or issues in the training process.
 
 <figure>
   <img src="./Figures/l2_error_vs_time.png" style="width:60%">
@@ -519,7 +499,7 @@ With the standard model (3 layers, 64 neurons in each layer, learning rate of 0.
 <figure>
   <img src="./Figures/raw_loss_plot.png" style="width:60%">
   <img src="./Figures/smoothed_loss_plot.png" style="width:60%">
-  <figcaption><strong>Figure 4.</strong> Training loss curves (raw and smoothed). Model converges towards a minimum loss value over time.</figcaption> 
+  <figcaption><strong>Figure 4.</strong> Training loss curves (raw and smoothed). The model converges towards a minimum loss value over time.</figcaption> 
 </figure>
 
 As seen in the loss curves above, the training process shows a steady decrease in the total loss over time, indicating that the model is learning to satisfy the data, physics, and boundary constraints. The raw loss curve exhibits some noise due to the stochastic nature of the optimization process, while the smoothed curve provides a clearer view of the overall convergence trend. The model appears to converge towards a minimum loss value, suggesting that it is successfully learning to approximate the solution to the 2D heat equation under the specified conditions.
@@ -552,7 +532,7 @@ https://github.com/user-attachments/assets/a880111c-97f0-421a-948b-01e13d974aae
      <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
 </figure>
 
-The learning rate can also greatly affect the convergence behavior. At high learning rates, it is possible that the local minima could be overshot to the point that it is hard for the network to find a new minima in the *loss landscape*. 
+The learning rate can also greatly affect the convergence behavior. At high learning rates, it is possible that the local minima could be overshot to the point that it is hard for the network to find a new minimum in the *loss landscape*. 
 
 <figure>
   <img src="./Figures/raw_loss_bad_lr.png" style="width:60%">
@@ -606,16 +586,16 @@ https://github.com/user-attachments/assets/d8499d8a-fd62-46c4-8886-7e23f0130b88
 
 ### 5.4.1 Observations
 
-The model is strongly affected by the structure of the network and the training process parameters. There is often a tradeoff between accuracy and computational efficiency, as more complex architectures and longer training times can lead to better approximations of the solution, but at the cost of increased computational resources and time. For example, increasing the number of epochs generally leads to improved accuracy, but with diminishing returns after a certain point. Similarly, increasing the number of neurons per layer can enhance the model's capacity to learn complex patterns, but may also lead to overfitting if not properly regularized. The learning rate is another critical hyperparameter that can influence convergence; too high a learning rate may cause the model to diverge, while too low a learning rate can result in slow convergence. The number of collocation points also plays a significant role in the accuracy of the PINN, as more collocation points can provide a better representation of the PDE residual across the domain, but at the cost of increased computational time for training. There is some fine tuning needed to find the optimal "sweet-spot" for a specific physics problem. 
+The model is strongly affected by the structure of the network and the training process parameters. There is often a tradeoff between accuracy and computational efficiency, as more complex architectures and longer training times can lead to better approximations of the solution, but at the cost of increased computational resources and time. For example, increasing the number of epochs generally leads to improved accuracy, but with diminishing returns after a certain point. Similarly, increasing the number of neurons per layer can enhance the model's capacity to learn complex patterns, but may also lead to overfitting if not properly regularized. The learning rate is another critical hyperparameter that can influence convergence; too high a learning rate may cause the model to diverge, while too low a learning rate can result in slow convergence. The number of collocation points also plays a significant role in the accuracy of the PINN, as more collocation points can provide a better representation of the PDE residual across the domain, but at the cost of increased computational time for training. There is some fine-tuning needed to find the optimal "sweet spot" for a specific physics problem. 
 
 ---
 
 ## 5.5 Computational Efficiency and Error
 
 ### 5.5.1 Computational Cost
-The training time for the PINN is $\mathcal{O}(\text{epochs} \cdot N_{collocation})$. Meaning the training time for the PINN is directly tied the number of epochs and the number of collocation points used to enforce the PDE residual. The computational cost of the analytical solution, which involves evaluating a truncated Fourier series, is $\mathcal{O}(M \cdot N)$, where $M$ and $N$ are the number of modes retained in the series expansion. There is a tradeoff between accuracy and computational efficiency, as increasing the number of epochs, neurons, hidden layers, or collocation points can lead to improved accuracy but also increases the computational resources and time required for training.
+The training time for the PINN is $\mathcal{O}(\text{epochs} \cdot N_{collocation})$. Meaning the training time for the PINN is directly tied to the number of epochs and the number of collocation points used to enforce the PDE residual. The computational cost of the analytical solution, which involves evaluating a truncated Fourier series, is $\mathcal{O}(M \cdot N)$, where $M$ and $N$ are the number of modes retained in the series expansion. There is a tradeoff between accuracy and computational efficiency, as increasing the number of epochs, neurons, hidden layers, or collocation points can lead to improved accuracy but also increase the computational resources and time required for training.
 
-Ideally, this method for approximating solutions to a physical phenomena would be compared to another method such as FEM or FDM. However, due to time constraints, this was not implemented. The accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2, but without a direct comparison to a classical numerical method, it is difficult to fully assess the computational efficiency and error of the PINN in relation to traditional approaches.
+Ideally, this method for approximating solutions to a physical phenomenon would be compared to another method, such as FEM or FDM. However, due to time constraints, this was not implemented. The accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2, but without a direct comparison to a classical numerical method, it is difficult to fully assess the computational efficiency and error of the PINN in relation to traditional approaches.
 - With a few simple modifications, the model produced an L2 error on the order of 1e-3, while only requiring eight minutes of training time (instead of 3-4 minutes), demonstrating the tradeoff between accuracy and efficiency. While this is a significant improvement in accuracy for very little additional training time, it is important to note that this error-training time tradeoff is not linear, and may vary depending on the specific problem, network architecture, and training parameters.
 
 https://github.com/user-attachments/assets/4167ed15-7926-44c4-ab47-c8c477699b68
@@ -630,23 +610,36 @@ https://github.com/user-attachments/assets/4167ed15-7926-44c4-ab47-c8c477699b68
 - Optimization error (local minima, convergence issues)
 - Numerical error in computing derivatives via automatic differentiation
 - Truncation error in the analytical solution (finite number of modes)
-- Sampling error from finite collocation points
+- Sampling errors from finite collocation points
 - Hyperparameter sensitivity and tuning
 - Computational precision (floating-point errors)
 - PINN approximation limits
 - Sampling bias
 
-
 ---
 
-# 6. Discussion
+# 6. Conclusion
 
-The PINN successfully captures the key physical phenomena of the 2D heat equation, including diffusion dynamics, boundary behavior, time evolution, and the initial conditions. To be clear, the PINN does not explicitly "solve" the PDE in the traditional sense, but rather learns an approximation that minimizes the PDE residual across the domain. This allows the PINN to generalize well in space and time and make accurate predictions at random locations and future time steps. However, there are limitations to this approach, including the need for careful tuning of hyperparameters, potential difficulties in capturing high-frequency modes, the fact that the learned solution may not satisfy the PDE exactly at all points, and the increase in error over time due to the diffusive nature of the problem. In practice, PINNs can be a powerful tool for solving PDEs when traditional numerical methods are infeasible or when data is available, but they may not always be the best choice for every problem, especially when high precision is required or when computational resources are limited. The way this PINN is constructed, an evolving physical system may require the PINN to *re-learn* a new solution based on the new conditions. This would add an extremely large computational cost to the problem, and may not be feasible for real-time applications. In contrast, classical numerical solvers can often be more efficient for solving PDEs with fixed conditions, but may struggle with complex geometries or data-driven problems where PINNs can excel.
+## 6.1 Discussion of Results and Limitations
+The PINN successfully captures the key physical phenomena of the 2D heat equation, including diffusion dynamics, boundary behavior, time evolution, and the initial conditions. To be clear, the PINN does not explicitly "solve" the PDE in the traditional sense, but rather learns an approximation that minimizes the PDE residual across the domain. This allows the PINN to generalize well in space and time and make accurate predictions at random locations and future time steps. However, there are limitations to this approach, including the need for careful tuning of hyperparameters, potential difficulties in capturing high-frequency modes, the fact that the learned solution may not satisfy the PDE exactly at all points, and the increase in error over time due to the diffusive nature of the problem. In practice, PINNs can be a powerful tool for solving PDEs when traditional numerical methods are infeasible or when data is available, but they may not always be the best choice for every problem, especially when high precision is required or when computational resources are limited. The way this PINN is constructed, an evolving physical system may require the PINN to *re-learn* a new solution based on the new conditions. This would add an extremely high computational cost to the problem and may not be feasible for real-time applications. In contrast, classical numerical solvers can often be more efficient for solving PDEs with fixed conditions but may struggle with complex geometries or data-driven problems where PINNs can excel.
 
+## 6.2 Attribution
 
-# 7. Attribution
+The following resources were consulted to support the theoretical background, numerical methods, and implementation of the Physics-Informed Neural Network (PINN) framework:
 
-[FEM](https://en.wikipedia.org/wiki/Finite_element_method)
+- Finite Element Method (FEM): Overview of variational-based numerical methods for solving partial differential equations.  
+  https://en.wikipedia.org/wiki/Finite_element_method
 
-[FDM](https://en.wikipedia.org/wiki/Finite_difference_method)
+- Finite Difference Method (FDM): Reference for discretization-based approaches to approximating differential operators.  
+  https://en.wikipedia.org/wiki/Finite_difference_method
+
+- *Neural Networks (3Blue1Brown series)*: Conceptual foundation for neural network structure, training, and backpropagation.  
+  https://www.youtube.com/watch?v=aircAruvnKk
+
+- *Applications of Physics-Informed Neural Networks*: Reference for PINN methodology and implementation strategies.  
+  https://uknowledge.uky.edu/physastron_etds/104/
+
+- *PyTorch Tutorials*: Primary reference for neural network implementation, automatic differentiation, and optimization routines.  
+  https://docs.pytorch.org/tutorials/
+
 
