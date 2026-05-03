@@ -558,11 +558,11 @@ https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
 
 ### 5.4.4 Effect of Hidden Layer Count
 
-https://github.com/user-attachments/assets/470a12a7-da6f-4198-a283-32079ca179ce
+https://github.com/user-attachments/assets/b7bce4d9-735f-4389-9f26-99b3963496e7
 
-https://github.com/user-attachments/assets/3f283529-b843-46ef-9617-b4188cc542f4
+https://github.com/user-attachments/assets/37837ec2-c1c0-4d07-95b7-e55c788f321d
 
-https://github.com/user-attachments/assets/fcc5d236-18d5-4472-94d0-e82c95d825bf
+https://github.com/user-attachments/assets/1dd43663-eba7-42b5-a795-0f2291040c8b
 
 <figure>
      <figcaption><strong>Figure 9.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
