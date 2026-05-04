@@ -309,11 +309,27 @@ e^{\partial_x} \, e^{i\,(k_x \, x + k_y y)}
 &= e^{i \, k_x} e^{i\,(k_x \, x + k_y y)} \\
 \end{align*}
 ```
-Therefore, any time we need to compute something involving a derivative we can simply do it in Fourier space. The very final piece of theory that needs to be built has to do with the computaion of the coefficients f1, f2, and f3 for the update formula. Those will not vary as we step through time. When we evalutate them in fourier space, we just substitute in the eigenvalues of L. However, these eigenvalues can be in regions where the formulas risk catastrophic cancellation. Therefore, they can be computationally unstable. Thankfully, a trick devleloped by Kassam and Trefethen addresses this. Recall Cauchy's Formula from Complex Analysis. 
+Therefore, any time we need to compute something involving a derivative we can simply do it in Fourier space. The very final piece of theory that needs to be built has to do with the computaion of the coefficients f1, f2, and f3 for the update formula. Those will not vary as we step through time. When we evalutate them in fourier space, we just substitute in the eigenvalues of L. However, these eigenvalues can be in regions where the formulas risk catastrophic cancellation. Therefore, they can be computationally unstable. Thankfully,a trick devleloped by Kassam and Trefethen addresses this. Recall Cauchy's Formula for integration from Complex Analysis. 
 
+```math
+f(a) = \frac{1}{2\pi i} \, \oint_{\gamma} \frac{f(z)}{z - a}\, dz
+```
+We will use this to evaluate f1, f2, and f3. Since our precarious points lie near 0, we take our contour to be the circle centered around our evaluation point, a. This is far enough away in practice. Then, we can just use trapezoidal rule to approximate the integral. 
+```math
+f(a) \, \approx \, \frac{2\pi}{N} \sum_{k=0}^{N-1} f\!\left(a + e^{2\pi i k / N}\right)\, i e^{2\pi i k / N}
+```
+In practice, we will take only the real value of this since we are only interested in real-valued problems for this project. Now that all the theory is complete, we can see how this is implemented in python. Surprsingly, despite being more theoreitcally complex, the implimenttion will be considerably simpler than the method of lines. 
 
-
-# Solving the Kuramoto Sivashinksy Equation
-Derive the particular update formula for ETDRK4 here for the KS equation. Show pretty plots, and the python implementation here.
-  
+### Implimentation
+Since we were interested in the KSE, we will implement our program with that problem in mind. We can indentify our L and N terms for ETDRK4as 
+```math
+\begin{aligned}
+L\, = \,  \nabla^2 u + \nabla^4 u \\
+N(u) = + |\nabla u|^2 \\
+\end{aligned}
+```
+Furthermore, it is easy to show that 
+```math
+L\,e^{i\,(k_x \, x + k_y y)} \, = \, (k_x^2 + k_y^2 - (k_x^2 + k_y^2)^2)\,e^{i\,(k_x \, x + k_y y)}
+```
   
