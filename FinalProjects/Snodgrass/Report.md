@@ -88,7 +88,7 @@ on the square domain $x,y \in [0,1]$, subject to homogeneous Neumann boundary co
 
 which physically correspond to an insulated domain (no heat flux across the boundary).
 
-     NOTE: The program can be easily modified to handle Dirichlet boundary conditions by changing the basis functions and eigenvalues accordingly. For the purposes of the report, focus will remain on the Neumann case, but remember that the code to implement the Dirichlet case is also available in the notebook, just commented out.
+NOTE: The program can be easily modified to handle Dirichlet boundary conditions by changing the basis functions and eigenvalues accordingly. For the purposes of the report, focus will remain on the Neumann case, but remember that the code to implement the Dirichlet case is also available in the notebook, just commented out.
 
 ---
 
@@ -135,9 +135,9 @@ T_{\max}\,e^{-A[(x-0.7)^2 + (y-0.7)^2]}
 
 The integrals for $C_{mn}$ are evaluated numerically using a two-dimensional trapezoidal rule over a uniform grid.
 
-     NOTE: Although the discussion of solving for and implementing the analytical solution is interesting, it is not strictly necessary for the project, as the main focus is on the implementation and performance of the PINN. However, having an analytical solution provides a valuable benchmark for evaluating the accuracy of the PINN and understanding the underlying physics of the problem. The code to compute the analytical solution is included in the notebook for completeness, but it can be commented out if desired without affecting the core functionality of the PINN implementation.
+NOTE: Although the discussion of solving for and implementing the analytical solution is interesting, it is not strictly necessary for the project, as the main focus is on the implementation and performance of the PINN. However, having an analytical solution provides a valuable benchmark for evaluating the accuracy of the PINN and understanding the underlying physics of the problem. The code to compute the analytical solution is included in the notebook for completeness, but it can be commented out if desired without affecting the core functionality of the PINN implementation.
 
-     NOTE: For the purposes of demonstrating the accuracy of the PINN, multiple unique initial conditions (and even boundary conditions) were implemented, tested, and reported on. For the sake of brevity, only one set of initial conditions (the two Gaussian peaks) is discussed in the report.
+NOTE: For the purposes of demonstrating the accuracy of the PINN, multiple unique initial conditions (and even boundary conditions) were implemented, tested, and reported on. For the sake of brevity, only one set of initial conditions (the two Gaussian peaks) is discussed in the report.
 
 ---
 
@@ -190,7 +190,7 @@ Activation functions are mathematical functions applied to the output of each ne
 
 Usually, when building a PINN, the `tanh` activation function is often chosen for the hidden layers due to its smoothness and differentiability, which are important for computing derivatives in the PDE loss. The `tanh` function allows the network to capture complex relationships in the data while ensuring that the gradients can be computed effectively during backpropagation, leading to better convergence and performance in approximating the solution to the PDE.
 
-     NOTE: The actual operation of activation functions in the (very involved) context of machine learning is a complex topic that is still an active area of research. The theory behind activation functions is beyond the scope of this project.
+NOTE: The actual operation of activation functions in the (very involved) context of machine learning is a complex topic that is still an active area of research. The theory behind activation functions is beyond the scope of this project.
 
 ## 3.3 Automatic Differentiation
 Automatic differentiation is a process in which derivatives of functions (the loss function with respect to the network parameters) are computed automatically by the machine learning framework (e.g., PyTorch, in this case). This is essential for training PINNs, as it allows for efficient computation of gradients needed for backpropagation. Automatic differentiation works by breaking down complex functions into a sequence of elementary operations and applying the chain rule of calculus to compute derivatives efficiently. This enables the PINN to *learn* from data while ensuring that the predicted solutions satisfy the governing PDEs, as the derivatives required for the physics-informed loss can be computed accurately and efficiently during training.
