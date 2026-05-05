@@ -2,7 +2,7 @@
 # **Physics-Informed Neural Networks (PINNs)**
 
 # Abstract
-Physics-Informed Neural Networks (PINNs) are a class of machine learning models that integrate physical laws into the training process. By embedding the governing mathematical equations of physical systems directly into the loss function, PINNs can learn complex relationships from data while adhering to known physical constraints. This project studies the architecture of PINNs, their training methodologies, and their applications in solving problems in physics.
+Physics-Informed Neural Networks (PINNs) are a class of machine learning models that integrate physical laws into the training process. By embedding the governing mathematical equations of physical systems directly into the loss function, PINNs can learn complex relationships from data while adhering to known physical constraints. The objective of this project is to investigate the ability of a PINN to approximate the solution of the 2D heat equation under Neumann boundary conditions, and to compare its accuracy against an analytical (Fourier-series) solution. Additionally, the sensitivity of the model to hyperparameters is investigated.
 
 ---
 
@@ -23,7 +23,7 @@ Firstly, PINNs leverage the universal function approximation capabilities of **n
 $u_\theta(x,y,t)$ represents the neural network approximation of the solution to the PDE, where $\theta$ denotes the network parameters. The neural network takes the spatial coordinates $(x,y)$ and time $t$ as inputs and outputs the predicted solution $u_\theta$. This output is then compared to the true solution to compute the loss function. The total losses are a measure of the accuracy of the neural network in approximating the solution. During training, these losses are used to update the network parameters through backpropagation. The architecture of the neural network, including the number of layers, neurons, and activation functions, is designed to capture the underlying physics of the problem while ensuring that the model can learn effectively from the data. The choice of activation functions is crucial for enabling the network to learn complex patterns and relationships in the data, which is essential for accurately approximating the solution to the PDE. 
 
 ## 1.3 Neural Network Training
-Loss minimization, backpropagation, and optimization algorithms are key components of training neural networks. 
+Loss minimization, backpropagation, and optimization algorithms are key components of training neural networks. An overview of these concepts is given here, but the training of the PINN is expanded on in sections 3.3, 3.4. 4.4, and 4.5.
 
 ### 1.3.1 Loss function
 The loss function quantifies the difference between the predicted output and the true output, guiding the optimization process to adjust the network's parameters for improved performance. There are several contributing factors to the total loss of an output, including the data loss, physics loss, initial condition loss, and boundary condition loss. The data loss measures the discrepancy between the predicted solution and the observed data, while the physics loss quantifies how well the predicted solution satisfies the governing PDE. The initial condition loss and boundary condition loss ensure that the predicted solution adheres to the specified initial and boundary conditions, respectively. By **minimizing** this total loss during training, the neural network can learn to approximate the solution to the PDE while respecting the underlying physical constraints.
@@ -86,7 +86,7 @@ on the square domain $x,y \in [0,1]$, subject to homogeneous Neumann boundary co
 \frac{\partial u}{\partial n} = 0 \quad \text{on all boundaries}
 ```
 
-which physically correspond to an insulated domain (no heat flux across the boundary).
+which physically correspond to an insulated domain (no heat flux across the boundary). Neumann boundary conditions were chosen because they simplify the analytical solution to a Fourier cosine series but also increase the complexity of the model that the PINN must learn. Enforcing Neumann conditions in PINNs is generally more challenging than Dirichlet conditions, as it requires accurate computation of spatial derivatives rather than direct value matching.
 
      NOTE: The program can be easily modified to handle Dirichlet boundary conditions by changing the basis functions and eigenvalues accordingly. For the purposes of the report, focus will remain on the Neumann case, but remember that the code to implement the Dirichlet case is also available in the notebook, just commented out.
 
@@ -318,11 +318,126 @@ Supporting libraries include:
 
 ---
 
-## 4.2 Network Architecture
+## 4.2 Analytical Solution
+
+The analytical solution is not the primary focus of this project or report. However, the implementation of the solution is relavent to understand exactly how the PINN's performance is measured. 
+
+### 4.2.1 Problem Initialization
+
+The first step in solving the 2D heat equation analytically is to define the problem parameters and initial conditions. The following code block declares the neccesary variables and starting heat distributions.
+
+```python
+A        = 25       # Amplitude of the initial Gaussian peaks
+alpha    = 0.01     # Diffusion coefficient
+temp_min = -2       # Minimum temperature (for the first peak)
+temp_max = 2        # Maximum temperature (for the second peak)
+tmax     = 5.0      # Simulation time
+
+# `initial_condition` defines the initial temperature distribution as a sum of two Gaussian peaks
+def initial_condition(X, Y, A, temp_min, temp_max):
+    return (
+        temp_min * np.exp(-A*((X-0.3)**2 + (Y-0.3)**2)) +
+        temp_max * np.exp(-A*((X-0.7)**2 + (Y-0.7)**2))
+    )
+```
+
+---
+
+### 4.2.2 `precompute_grid`
+
+This function creates a grid of points in the spatial domain [0,1]x[0,1] for numerical integration when computing the Fourier coefficients. The grid is defined by `Nx` and `Ny`, which specify the number of points in the x and y directions, respectively. The function returns the 1D arrays `x` and `y`, as well as the 2D meshgrid arrays `X` and `Y`, which are used for evaluating the initial condition and performing numerical integration to compute the Fourier coefficients.
+
+```python
+# ----------------------------
+# u(x,y,0) = 2 peaks at (0.3,0.3) and (0.7,0.7)
+# ----------------------------
+# `precompute_grid` creates a grid of points in the spatial domain [0,1]x[0,1] for numerical integration when computing the Fourier coefficients
+def precompute_grid(Nx=200, Ny=200):
+    x = np.linspace(0, 1, Nx)
+    y = np.linspace(0, 1, Ny)
+    X, Y = np.meshgrid(x, y, indexing='ij')
+    return x, y, X, Y
+```
+
+### 4.2.3 `compute_coefficient`
+
+This function computes the Fourier coefficients $C_{mn}$ for the initial condition by performing numerical integration of the product of the initial condition and the corresponding basis function (cosine terms) over the spatial domain. The normalization factor is determined based on whether $m$ and $n$ are zero or not, which affects the orthogonality of the basis functions. The function uses the trapezoidal rule for numerical integration, first integrating along the x-axis and then along the y-axis to compute the final coefficient value.
+
+```python
+def compute_coefficient(m, n, x, y, X, Y, u0):
+    phi = np.cos(m * np.pi * X) * np.cos(n * np.pi * Y)
+    integrand = u0 * phi
+
+    integral_x = np.trapezoid(integrand, x, axis=0)
+    integral   = np.trapezoid(integral_x, y)
+
+    if m == 0 and n == 0:
+        norm = 1.0
+    elif m == 0 or n == 0:
+        norm = 2.0
+    else:
+        norm = 4.0
+
+    return norm * integral
+```
+
+### 4.2.4 `precompute_coefficients`
+
+This function precomputes the Fourier coefficients for all combinations of $m$ and $n$ up to $M$ and $N$, respectively, and stores them in a matrix $C$. This allows for efficient retrieval of the coefficients when calculating the analytical solution at later times. The function first creates a grid of points using `precompute_grid`, evaluates the initial condition at those points, and then iterates over all combinations of $m$ and $n$ to compute the corresponding Fourier coefficients using the `compute_coefficient` function. The resulting matrix C contains the coefficients that can be used to reconstruct the solution at any time $t$ using the analytical formula derived from separation of variables.
+
+```python
+def precompute_coefficients(M, N, A, temp_min, temp_max, Nx=200, Ny=200):
+    x, y, X, Y = precompute_grid(Nx, Ny)
+    u0 = initial_condition(X, Y, A, temp_min, temp_max)
+
+    C = np.zeros((M, N))
+
+    for m in range(M):
+        for n in range(N):
+            C[m, n] = compute_coefficient(m, n, x, y, X, Y, u0)
+
+    return C
+```
+
+### 4.2.5 `precompute_phi_cache`
+
+This function precomputes the basis functions for all combinations of $m$ and $n$ at the grid points defined by $X$ and $Y$. The resulting `phi_cache` is a 4D array where the first two dimensions correspond to the mode indices $m$ and $n$, and the last two dimensions correspond to the spatial grid points. This caching allows for efficient retrieval of the basis functions when calculating the analytical solution at later times, as it avoids redundant computations of the cosine terms for each evaluation of the solution.
+
+```python
+def precompute_phi_cache(X, Y, M, N):
+    Nx, Ny = X.shape
+    phi_cache = np.zeros((M, N, Nx, Ny))
+
+    for m in range(M):
+        for n in range(N):
+            phi_cache[m, n] = np.cos(m*np.pi*X) * np.cos(n*np.pi*Y)
+
+    return phi_cache
+```
+
+### 4.2.6 `analytical_solution`
+
+This function calculates the temperature distribution $u(x,y,t)$ at any given time $t$ using the precomputed Fourier coefficients and basis functions. It iterates over all combinations of $m$ and $n$, retrieves the corresponding coefficient from matrix $C$ and the basis function from `phi_cache`, and sums up the contributions of all modes to compute the final solution at time $t$. The exponential decay factor accounts for the temporal evolution of each mode according to the heat equation, ensuring that the solution accurately reflects the diffusion process over time.
+
+```python
+def analytical_solution(X, Y, t, alpha, C, phi_cache, M, N):
+    u = np.zeros_like(X)
+
+    for m in range(M):
+        for n in range(N):
+            lam = (m**2 + n**2)
+            u += C[m, n] * phi_cache[m, n] * np.exp(-alpha * np.pi**2 * lam * t)
+
+    return u
+```
+
+---
+
+## 4.3 Network Architecture
 
 The PINN approximates the temperature field, $u_\theta(x,y,t) $, using a fully connected feedforward neural network.
 
-### 4.2.1 Structure
+### 4.3.1 Structure
 
 The implemented architecture consists of:
 
@@ -350,7 +465,7 @@ class PINN(nn.Module):
         return self.net(x)
 ```
 
-### 4.2.2 Explanation of Design Choices
+### 4.3.2 Explanation of Design Choices
 
 Firstly, like many other aspects of this project, the network architecture is a free parameter that can be studied and tuned for optimal performance. Several structures were implemented and tested, including variations in the number of hidden layers, neurons per layer, and activation functions. The chosen architecture (3 hidden layers with 64 neurons each and Tanh activation) was found to provide a good balance between model capacity and training stability for this specific problem. 
 - The **Tanh activation function** is used because it produces smooth, differentiable outputs, which are essential for computing higher-order derivatives required in the PDE residual.
@@ -361,11 +476,11 @@ Firstly, like many other aspects of this project, the network architecture is a 
 
 ---
 
-## 4.3 Training Methodology
+## 4.4 Training Preparation
 
 The training process is an iterative process in which the neural network parameters (weight matrices, bias vectors, etc.) are updated to minimize the total loss function. The update is based on the computed gradients of the loss function and continues until a local minimum is reached or a specified number of `epochs` (complete passes through the training data) is completed.
 
-### 4.3.1 Sampling Data Points
+### 4.4.1 Sampling Data Points
 
 Three distinct types of training points are used:
 
@@ -392,25 +507,32 @@ Three distinct types of training points are used:
           - Uniform random sampling across space-time domain is used to compute the PDE residual loss: $u_t - \alpha (u_{xx} + u_{yy})$ at these points, ensuring that the learned solution satisfies the governing PDE throughout the domain.
 
 3. Boundary Condition Points
-     - These enforce the Neumann boundary conditions at the domain boundaries.
+     - The following cell defines both Dirichlet and Neumann boundary conditions for the heat equation. The `dirichlet_bc` enforces fixed temperature values at the boundaries (x=0 and x=1), while the `neumann_bc` enforces zero heat flux at the boundaries, meaning that the spatial derivative of the temperature is zero at those points. These boundary conditions are crucial for ensuring that the solution to the heat equation is physically meaningful and well-posed.
      - ```python
-          x0       = torch.zeros_like(t_bc)                           # Boundary condition at x=0
-          x1       = torch.ones_like(t_bc)                            # Boundary condition at x=1. torch.ones_like 
-          y_rand   = torch.rand(N_bc,1)                               # Random points in space for boundary conditions (y values for x=0 and x=1)
+          def sample_boundary_points(N_bc=1000, tmax=1.0):
+               t = tmax * torch.rand(N_bc,1)
+               
+               # --- Create boundary points ---
+               x0 = torch.zeros_like(t)
+               x1 = torch.ones_like(t)
+               y0 = torch.zeros_like(t)
+               y1 = torch.ones_like(t)
 
-          X_left   = torch.cat([x0, y_rand, t_bc], dim=1)             # Combine x=0, random y, and time for left boundary condition points
-          X_right  = torch.cat([x1, y_rand, t_bc], dim=1)             # Combine x=1, random y, and time for right boundary condition points
+               # --- Create random points along the boundaries ---
+               x_rand = torch.rand(N_bc,1)
+               y_rand = torch.rand(N_bc,1)
 
-          y0       = torch.zeros_like(t_bc)                           # Boundary condition at y=0
-          y1       = torch.ones_like(t_bc)                            # Boundary condition at y=1
-          x_rand   = torch.rand(N_bc,1)                               # Random points in space for boundary conditions (x values for y=0 and y=1)
+               # --- Combine boundary points with random points and time to create the full set of boundary condition points ---
+               X_left   = torch.cat([x0, y_rand, t], dim=1)
+               X_right  = torch.cat([x1, y_rand, t], dim=1)
+               X_bottom = torch.cat([x_rand, y0, t], dim=1)
+               X_top    = torch.cat([x_rand, y1, t], dim=1)
 
-          X_bottom = torch.cat([x_rand, y0, t_bc], dim=1)             # Combine random x, y=0, and time for bottom boundary condition points
-          X_top    = torch.cat([x_rand, y1, t_bc], dim=1)             # Combine random x, y=1, and time for top boundary condition points
+          return X_left, X_right, X_bottom, X_top
        ```
           - Random sampling along the boundaries ensures that the Neumann conditions are enforced across the entire boundary, rather than just at a few fixed points, leading to a more accurate representation of the insulated domain.
 
-### 4.3.2 Training Process
+## 4.5 Training Process (Loop)
 
 #### Optimizer and Learning Rate
 The **Adam** optimizer is used for training the PINN, which is a popular choice for training deep learning models due to its adaptive learning rate and momentum properties. The optimizer updates the network parameters based on the computed gradients of the loss function, allowing for efficient convergence towards a local minimum.
@@ -428,15 +550,77 @@ The training process is run for a specified number of epochs, which represents t
 - Backward pass: The gradients of the loss with respect to the network parameters are computed using backpropagation.
 - Parameter update: The optimizer updates the network parameters based on the computed gradients.
 
-### 4.3.3 Boundary Condition Enforcement
-The Neumann boundary conditions are enforced by computing the derivatives of the network output at the boundaries and including these in the loss function. The computed derivatives are then used to define a boundary condition loss term that penalizes deviations from the specified Neumann conditions, ensuring that the learned solution satisfies the physical constraints of an insulated box.
 ```python
-du_dx_left  = grad_left[:,0:1]
-du_dx_right = grad_right[:,0:1]
+epochs    = 10000                                               # Number of training `epochs` (iterations over the entire training dataset)
+lr        = 0.001                                               # Learning rate
+model     = PINN()                                              # Initialize the PINN model
+optimizer = torch.optim.Adam(model.parameters(), lr=lr)         # Use Adam optimizer to train the model with a learning rate of 0.001
+
+M, N = 20, 20
+C = precompute_coefficients(M, N, A, temp_min, temp_max)
+X_left, X_right, X_bottom, X_top = sample_boundary_points()     # Sample boundary condition points for training (Neumann BCs as implemented)  
+
+####################################################
+# THE FOLLOWING CODE IN SECTION 4.5 IS IN THIS LOOP
+for epoch in range(epochs):
+    optimizer.zero_grad() 
+    ...
+```
+
+### 4.5.1 Boundary Condition Enforcement
+The Neumann boundary conditions are enforced by computing the derivatives of the network output at the boundaries and including these in the loss function. The computed derivatives are then used to define a boundary condition loss term that penalizes deviations from the specified Neumann conditions, ensuring that the learned solution satisfies the physical constraints of an insulated box.
+- Enable gradients section
+     - Creates a copy of the boundary points that requires gradients for automatic differentiation. This allows us to compute derivatives with respect to these points.
+- Forward pass section
+     - Predicts the output of the neural network at the boundary points, which is necessary for computing the normal derivatives required for enforcing the Neumann boundary conditions.
+- Compute gradients section
+     - Computes the gradients of the network output with respect to the boundary points using automatic differentiation. This is essential for calculating the normal derivatives ($\frac{\partial u}{\partial n}$) at the boundaries, which are used to enforce the Neumann boundary conditions in the loss function.
+
+```python
+# --- Enable gradients ---
+X_left   = X_left.clone().detach().requires_grad_(True)
+X_right  = X_right.clone().detach().requires_grad_(True)
+X_bottom = X_bottom.clone().detach().requires_grad_(True)
+X_top    = X_top.clone().detach().requires_grad_(True)
+
+# --- Forward pass ---
+u_left   = model(X_left)
+u_right  = model(X_right)
+u_bottom = model(X_bottom)
+u_top    = model(X_top)
+
+# --- Compute gradients ---
+grad_left = torch.autograd.grad(
+     u_left, X_left,    
+     grad_outputs=torch.ones_like(u_left),  
+     create_graph=True        )[0]
+
+grad_right = torch.autograd.grad(
+     u_right, X_right,
+     grad_outputs=torch.ones_like(u_right),
+     create_graph=True        )[0]
+
+grad_bottom = torch.autograd.grad(
+     u_bottom, X_bottom,
+     grad_outputs=torch.ones_like(u_bottom),
+     create_graph=True        )[0]
+
+grad_top = torch.autograd.grad(
+     u_top, X_top,
+     grad_outputs=torch.ones_like(u_top),
+     create_graph=True        )[0]
+```
+
+Next, the normal derivatives at the boundaries are extracted from the computed gradients. For Neumann boundary conditions, the normal derivative corresponds to the spatial derivative of the temperature field at the boundaries. The computed derivatives are then used to define the boundary condition loss, which penalizes any deviation from the specified Neumann conditions (i.e., zero normal derivative), ensuring that the learned solution satisfies the physical constraints of an insulated box.
+
+```python
+du_dx_left   = grad_left[:,0:1]
+du_dx_right  = grad_right[:,0:1]
 du_dy_bottom = grad_bottom[:,1:2]
 du_dy_top    = grad_top[:,1:2]
 ```
-Then the boundary condition loss is defined as:
+
+Then, the boundary condition loss is defined as the mean squared error of these derivatives, which encourages the model to learn a solution that satisfies the Neumann boundary conditions across the entire boundary of the domain.
 ```python
 bc_loss = (
     torch.mean(du_dx_left**2) +
@@ -444,6 +628,65 @@ bc_loss = (
     torch.mean(du_dy_bottom**2) +
     torch.mean(du_dy_top**2)
 )
+```
+
+### 4.5.2 Data Enforcement
+
+To enforce the initial condition, the predicted solution at the initial time (t=0) is compared to the known initial condition data. The mean squared error (MSE) between the predicted and true values is computed to define the data loss, which encourages the model to learn a solution that matches the specified initial temperature distribution.
+
+```python
+     u_pred_data = model(X_data)
+     data_loss = torch.mean((u_pred_data - u_data)**2) # MSE
+```
+
+### 4.5.3 Physics Enforcement
+
+To enforce the governing PDE (heat equation), the predicted solution at the collocation points is used to compute the PDE residual. The mean squared error of the residual defines the physics loss, which encourages the model to *learn* a solution that satisfies the heat equation throughout the domain.
+
+```python 
+    X_col_epoch = X_col.clone().detach().requires_grad_(True)   # A little PyTorch magic again
+    u = model(X_col_epoch)                                      # Predict u(x,t) at the col pts using the current state of the model. 
+
+    # ------------ 1 - First derivatives ------------
+    grads = torch.autograd.grad(   # Compute the gradients of u with respect to the collocation points (x,t) to get u_x and u_t for the PDE residual.
+        outputs=u,
+        inputs=X_col_epoch,
+        grad_outputs=torch.ones_like(u),
+        create_graph=True     )[0]
+
+    u_x = grads[:,0:1]             # First derivative with respect to x (u_x)
+    u_y = grads[:,1:2]             # First derivative with respect to y (u_y)
+    u_t = grads[:,2:3]             # First derivative with respect to t (u_t)  
+
+    # ------------ 2 - Second derivatives (u_xx, u_yy) ------------
+    u_xx = torch.autograd.grad(
+        outputs=u_x,
+        inputs=X_col_epoch,
+        grad_outputs=torch.ones_like(u_x),
+        create_graph=True     )[0][:,0:1]
+
+    u_yy = torch.autograd.grad(
+        outputs=u_y,
+        inputs=X_col_epoch,
+        grad_outputs=torch.ones_like(u_y),
+        create_graph=True     )[0][:,1:2]
+
+    # Heat equation residual
+    physics_loss = torch.mean((u_t - alpha * (u_xx + u_yy))**2)
+```
+
+### 4.5.4 Total Loss and Learning
+
+There is some convenient features in PyTorch that allow us to compute the total loss and perform backpropagation in just a few lines of code. The total loss is computed as a weighted sum of the data loss, physics loss, and boundary condition loss. The weights (lambda coefficients) can be tuned to balance the importance of each term in the loss function, which can affect the convergence behavior and accuracy of the model.
+
+```python
+    lambda_data = 1.0
+    lambda_phys = 1.0
+    lambda_bc   = 1.0 
+    loss = (lambda_data * data_loss) + (lambda_phys * physics_loss) + (lambda_bc * bc_loss)
+
+    loss.backward()      # Backpropagate the loss to compute gradients of the loss with respect to the model parameters.
+    optimizer.step()     # Update the model parameters using the computed gradients. This is where the learning happens.    
 ```
 
 ---
@@ -487,7 +730,7 @@ Plotting the L2 error over time provides insight into how the accuracy of the PI
 
 <figure>
   <img src="./Figures/l2_error_vs_time.png" style="width:60%">
-  <figcaption><strong>Figure 3.</strong> L2 relative error over time.</figcaption> 
+  <figcaption><strong>Figure 3.</strong> L2 error over time.</figcaption> 
 </figure>
 
 With the standard model (3 layers, 64 neurons in each layer, learning rate of 0.001, tanh activation function, 7,000 epochs...), the accuracy of the PINN is quite good, with a relative L2 error on the order of 1e-2. The error increases slightly over time, which is expected due to the nature of the diffusion process and the accumulation of approximation errors. However, the overall low error indicates that the PINN is successfully learning to approximate the solution to the 2D heat equation under the specified initial and boundary conditions.
@@ -505,6 +748,7 @@ With the standard model (3 layers, 64 neurons in each layer, learning rate of 0.
 As seen in the loss curves above, the training process shows a steady decrease in the total loss over time, indicating that the model is learning to satisfy the data, physics, and boundary constraints. The raw loss curve exhibits some noise due to the stochastic nature of the optimization process, while the smoothed curve provides a clearer view of the overall convergence trend. The model appears to converge towards a minimum loss value, suggesting that it is successfully learning to approximate the solution to the 2D heat equation under the specified conditions.
 
 ## 5.4 Sensitivity to Hyperparameters
+
 ### 5.4.1 Effect of Epochs
 
 https://github.com/user-attachments/assets/51d1487e-8efe-491e-8e40-8aefe91185ff
@@ -517,6 +761,8 @@ https://github.com/user-attachments/assets/bf353794-9318-4391-8f64-f782c93860be
      <!-- <video controls src="5sec_hot-cold.mp4" title="Title"></video> -->
      <figcaption><strong>Figure 5.</strong> Epochs: 10,000 vs 1,000 vs 500. Other PINN parameters: 0.001 learning rate, 3 hidden layers, 64 neurons per layer. </figcaption>
 </figure>
+
+The number of epochs directly affects the convergence of the model. Too little training (low epochs) results in a model that does not *understand* the physics well enough to approximate a good solution. Given more training time (higher epochs), the model is able to understand the physics better (minimize the loss function more effectively) and thereby produce an accurate solution. However, training is expensive and there are diminishing returns after a certain point, as the model may have already converged to a good solution and further training may not significantly improve accuracy.
 
 ---
 
@@ -532,13 +778,15 @@ https://github.com/user-attachments/assets/a880111c-97f0-421a-948b-01e13d974aae
      <figcaption><strong>Figure 6.</strong> Learning rate: 0.001 vs 0.005 vs 0.01. Other PINN parameters: 7,000 epochs, 3 hidden layers, 64 neurons per layer.</figcaption>
 </figure>
 
-The learning rate can also greatly affect the convergence behavior. At high learning rates, it is possible that the local minima could be overshot to the point that it is hard for the network to find a new minimum in the *loss landscape*. 
+The learning rate can also greatly affect the convergence behavior. At high learning rates, it is possible that the local minima could be overshot to the point that it is hard for the network to find a new minimum in the *loss landscape*. Conversely, very low learning rates can result in slow convergence, requiring more epochs to reach an acceptable solution.
 
 <figure>
   <img src="./Figures/raw_loss_bad_lr.png" style="width:60%">
   <img src="./Figures/smoothed_loss_bad_lr.png" style="width:60%">
-  <figcaption><strong>Figure 7.</strong> Convergence behavior with a poorly choosen learning rate.</figcaption> 
+  <figcaption><strong>Figure 7.</strong> Convergence behavior with a poorly chosen learning rate.</figcaption> 
 </figure>
+
+A learning rate that is too high can lead to divergence, where the loss increases over time instead of decreasing, as seen in the loss curves above. The plot shows a clear divergence well into the training process which is caused by a high learning rate overshooting the local minimum it was converging towards in the loss landscape. This indicates that the model may not be able to find a stable solution and might instead oscillate or diverge in the parameter space. On the other hand, a learning rate that is too low may result in very slow convergence, where the loss decreases very gradually and may require a large number of epochs to reach an acceptable solution. Therefore, it is important to choose an appropriate learning rate to ensure efficient training and good convergence behavior.
 
 ---
 
@@ -554,6 +802,8 @@ https://github.com/user-attachments/assets/d848d0f4-c717-4ac3-92bb-4b5aff1c5d07
      <figcaption><strong>Figure 8.</strong> Neurons per layer: 128 vs 64 vs 8. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 3 hidden layers.</figcaption>
 </figure>
 
+The number of neurons per layer affects the capacity of the PINN to learn complex patterns in the data. Too few neurons may lead to underfitting, where the model is not able to capture the underlying physics of the problem, while too many neurons can lead to overfitting, where the model learns noise in the training data instead of the solution. For this problem, 64 neurons per layer provided a good balance between training time and accuracy, while 8 neurons per layer resulted in a model that was too simple, and 128 neurons per layer did not significantly improve accuracy compared to 64 neurons. Additionally, added neurons increases the training cost, so it is important to find a balance between accuracy and efficiency when choosing the number of neurons per layer.
+
 ---
 
 ### 5.4.4 Effect of Hidden Layer Count
@@ -568,6 +818,8 @@ https://github.com/user-attachments/assets/1dd43663-eba7-42b5-a795-0f2291040c8b
      <figcaption><strong>Figure 9.</strong> Hidden layers: 3 vs 2 vs 1. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer.</figcaption>
 </figure>
 
+The number of hidden layers affects the depth of the network and its ability to learn hierarchical representations of the data. A deeper network (more hidden layers) can potentially capture more complex patterns in the solution, but it may also be computationally expensive to train. For this problem, 3 hidden layers provided a good balance between accuracy and training time, while 1 hidden layer resulted in a model that was too shallow to capture the complexity of the solution, and 2 hidden layers resulted in strange behavior that went against the obvious intuition of heat diffusion. As with the number of neurons, it is important to find a balance between model complexity and training efficiency when choosing the number of hidden layers.
+
 ---
 
 ### 5.4.5 Effect of Collocation Points
@@ -580,11 +832,13 @@ https://github.com/user-attachments/assets/d8499d8a-fd62-46c4-8886-7e23f0130b88
      <figcaption><strong>Figure 10.</strong> Collocation points: 500 vs 100. Other PINN parameters: 7,000 epochs, 0.001 learning rate, 64 neurons per layer, 3 hidden layers.</figcaption>
 </figure>
 
+The number of collocation points affects the accuracy of the PINN while enforcing the PDE residual. These collocation points are used to compute the physics loss by evaluating the difference between the predicted solution and the governing PDE at these points. A higher number of collocation points provides a better representation of the PDE residual. However, higher collocation points also increase the computational cost of training, as the model needs to compute the PDE residual at more points during each training iteration. For this visual, 500 collocation points seemed to be the point at which a noticable difference in accuracy could be observed, while 100 collocation points resulted in a model that was not able to capture the physics of the problem well enough to produce an accurate solution. Therefore, it is important to find a balance between accuracy and computational efficiency when choosing the number of collocation points for training a PINN.
+
      For context, $N_{Collocation}=2,000$ was used for most of the results in the report
 
 ---
 
-### 5.4.1 Observations
+### 5.4.6 Observations
 
 The model is strongly affected by the structure of the network and the training process parameters. There is often a tradeoff between accuracy and computational efficiency, as more complex architectures and longer training times can lead to better approximations of the solution, but at the cost of increased computational resources and time. For example, increasing the number of epochs generally leads to improved accuracy, but with diminishing returns after a certain point. Similarly, increasing the number of neurons per layer can enhance the model's capacity to learn complex patterns, but may also lead to overfitting if not properly regularized. The learning rate is another critical hyperparameter that can influence convergence; too high a learning rate may cause the model to diverge, while too low a learning rate can result in slow convergence. The number of collocation points also plays a significant role in the accuracy of the PINN, as more collocation points can provide a better representation of the PDE residual across the domain, but at the cost of increased computational time for training. There is some fine-tuning needed to find the optimal "sweet spot" for a specific physics problem. 
 
@@ -621,6 +875,7 @@ https://github.com/user-attachments/assets/4167ed15-7926-44c4-ab47-c8c477699b68
 # 6. Conclusion
 
 ## 6.1 Discussion of Results and Limitations
+
 The PINN successfully captures the key physical phenomena of the 2D heat equation, including diffusion dynamics, boundary behavior, time evolution, and the initial conditions. To be clear, the PINN does not explicitly "solve" the PDE in the traditional sense, but rather learns an approximation that minimizes the PDE residual across the domain. This allows the PINN to generalize well in space and time and make accurate predictions at random locations and future time steps. However, there are limitations to this approach, including the need for careful tuning of hyperparameters, potential difficulties in capturing high-frequency modes, the fact that the learned solution may not satisfy the PDE exactly at all points, and the increase in error over time due to the diffusive nature of the problem. In practice, PINNs can be a powerful tool for solving PDEs when traditional numerical methods are infeasible or when data is available, but they may not always be the best choice for every problem, especially when high precision is required or when computational resources are limited. The way this PINN is constructed, an evolving physical system may require the PINN to *re-learn* a new solution based on the new conditions. This would add an extremely high computational cost to the problem and may not be feasible for real-time applications. In contrast, classical numerical solvers can often be more efficient for solving PDEs with fixed conditions but may struggle with complex geometries or data-driven problems where PINNs can excel.
 
 ## 6.2 Attribution
@@ -643,3 +898,4 @@ The following resources were consulted to support the theoretical background, nu
   https://docs.pytorch.org/tutorials/
 
 
+This work was developed independently, but credit and thanks are due to Prakash Adhikari for his mentorship and guidance at the early stages of this project.
